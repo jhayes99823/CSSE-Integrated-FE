@@ -11,6 +11,8 @@ const logger = require('morgan');
 
 app.use(logger('dev'));
 
+app.use('/', express.static("public"));
+
 app.use('/api/', bodyParser.urlencoded({ extended: true }));
 app.use('/api/', bodyParser.json());
 app.use("/api/", router);
