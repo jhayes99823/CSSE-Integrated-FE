@@ -30,4 +30,58 @@ router.post('/login', (req, res) => {
         });
 });
 
+router.get('/like', (req, res) => {
+    const { username } = req.query;
+
+    ops.getLikedGamesByUserId(username)
+        .then((result) => {
+            res.json({ returnValue: result });
+        });
+});
+
+router.post('/like', (req, res) => {
+    const { username, gameID } = req.body;
+
+    ops.addGamesToLikedList(username, gameID)
+        .then((result) => {
+            res.json({ returnValue: result });
+        });
+});
+
+router.delete('/like', (req, res) => {
+    const { username, gameID } = req.body;
+
+    ops.deleteGameFromLikedList(username, gameID)
+        .then((result) => {
+            res.json({ returnValue: result });
+        });
+});
+
+router.get('/dislike', (req, res) => {
+    const { username } = req.query;
+
+    ops.getDislikedGamesByUserId(username)
+        .then((result) => {
+            res.json({ returnValue: result });
+        });
+});
+
+router.post('/dislike', (req, res) => {
+    const { username, gameID } = req.body;
+
+    ops.addGameToDislikedList(username, gameID)
+        .then((result) => {
+            res.json({ returnValue: result });
+        });
+});
+
+router.delete('/dislike', (req, res) => {
+    const { username, gameID } = req.body;
+
+    ops.deleteGameFromDislikedList(username, gameID)
+        .then((result) => {
+            res.json({ returnValue: result });
+        });
+});
+
 module.exports = router;

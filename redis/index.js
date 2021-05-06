@@ -75,9 +75,75 @@ async function login(username, password) {
     return userToReturn;
 }
 
+async function getLikedGamesByUserId(userId, low = 0, high = -1) {
+    let userToReturn = await client.smembers(userId + USER_LIKED_BASE);
+
+    return userToReturn;
+}
+
+async function getDislikedGamesByUserId(userId, low = 0, high = -1) {
+    let userToReturn = await client.smembers(userId + USER_DISLIKED_BASE);
+
+    return userToReturn;
+}
+
+async function addGamesToLikedList(steamID, gameID) {
+    let gameList = await client.sadd(steamID + USER_LIKED_BASE, gameID);
+
+    if (gameList == 1) {
+        console.log('Game Successfully ADDED')
+        return true;
+    } else {
+        console.log('ERROR: Game already exists in set')
+        return false;
+    }
+}
+
+async function deleteGameFromLikedList(steamID, gameID) {
+    let gameList = await client.srem(steamID + USER_LIKED_BASE, gameID);
+
+    if (gameList == 1) {
+        console.log('Game Successfully REMOVED')
+        return true;
+    } else {
+        console.log('ERROR: Game does not exist in set')
+        return false;
+    }
+}
+
+async function addGameToDislikedList(steamID, gameID) {
+    let gameList = await client.sadd(steamID + USER_DISLIKED_BASE, gameID);
+
+    if (gameList == 1) {
+        console.log('Game Successfully ADDED')
+        return true;
+    } else {
+        console.log('ERROR: Game already exists in set')
+        return false;
+    }
+}
+
+async function deleteGameFromDislikedList(steamID, gameID) {
+    let gameList = await client.srem(steamID + USER_DISLIKED_BASE, gameID);
+
+    if (gameList == 1) {
+        console.log('Game Successfully REMOVED')
+        return true;
+    } else {
+        console.log('ERROR: Game does not exist in set')
+        return false;
+    }
+}
+
 module.exports = {
     createUser,
     updateUsername,
     getUser,
-    login
+    login,
+    getLikedGamesByUserId,
+    getDislikedGamesByUserId,
+    addGamesToLikedList,
+    addGameToDislikedList,
+    deleteGameFromLikedList,
+    deleteGameFromDislikedList
 }
