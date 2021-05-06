@@ -78,6 +78,8 @@ router.post('/dislike', (req, res) => {
 router.delete('/dislike', (req, res) => {
     const { username, gameID } = req.body;
 
+    console.log('username ', username, '   gameID  ', gameID);
+
     ops.deleteGameFromDislikedList(username, gameID)
         .then((result) => {
             res.json({ returnValue: result });

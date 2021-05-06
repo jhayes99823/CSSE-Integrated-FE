@@ -21,6 +21,9 @@
     <button type="button" id="add-liked" class="btn bmd-btn-fab" data-toggle="modal" data-target="#addLikedModal">
       <i class=" material-icons">add</i>
     </button>
+    <button type="button" id="delete-liked" class="btn bmd-btn-fab" data-toggle="modal" data-target="#deleteLikeModal">
+      <i class="material-icons">delete</i>
+    </button>
     <div id="card-container" class="container">
       <div id="itemRow-like" class="row"></div>
 
@@ -29,6 +32,10 @@
     <p>DISLIKED GAMES</p>
     <button type="button" id="add-disliked" class="btn bmd-btn-fab" data-toggle="modal" data-target="#addDislikeModal">
       <i class="material-icons">add</i>
+    </button>
+    <button type="button" id="delete-disliked" class="btn bmd-btn-fab" data-toggle="modal"
+      data-target="#deleteDislikeModal">
+      <i class="material-icons">delete</i>
     </button>
     <div id="card-container" class="container">
       <div id="itemRow-dislike" class="row"></div>
@@ -60,6 +67,30 @@
     </div>
   </div>
 
+  <!-- Delete Dislike Modal -->
+  <div class="modal fade" id="deleteDislikeModal" tabindex="-1" role="dialog"
+    aria-labelledby="delete dislike to your list" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Delete Game from Dislike List</h5>
+        </div>
+        <div class="modal-body">
+          <div class="form-group bmd-form-group">
+            <label for="dislikedOptList" class="bmd-label-floating">Games</label>
+            <select class="form-select form-control" id="dislikedOptList" aria-label="Default select example">
+              <option selected value="0">Select item category</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">CANCEL</button>
+          <button type="button" id="deleteDislikedGame" class="btn btn-primary" data-dismiss="modal">DELETE</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Add Like Modal -->
   <div class="modal fade" id="addLikedModal" tabindex="-1" role="dialog" aria-labelledby="Add like to your list"
     aria-hidden="true">
@@ -79,6 +110,30 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">CANCEL</button>
           <button type="button" id="submitLikedGame" class="btn btn-primary" data-dismiss="modal">ADD</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Like Modal -->
+  <div class="modal fade" id="deleteLikeModal" tabindex="-1" role="dialog" aria-labelledby="delete game from your list"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Delete Game from Like List</h5>
+        </div>
+        <div class="modal-body">
+          <div class="form-group bmd-form-group">
+            <label for="likedOptList" class="bmd-label-floating">Games</label>
+            <select class="form-select form-control" id="likedOptList" aria-label="Default select example">
+              <option selected value="0">Select item category</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">CANCEL</button>
+          <button type="button" id="deleteLikedGame" class="btn btn-primary" data-dismiss="modal">DELETE</button>
         </div>
       </div>
     </div>

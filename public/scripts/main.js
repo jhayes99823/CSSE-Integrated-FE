@@ -89,6 +89,42 @@ rhit.MainPageController = class {
 			$('#gameOptList').empty()
 		});
 
+		$("#deleteDislikeModal").on("show.bs.modal", (event) => {
+			console.log('made it here');
+			// pre animation
+			fetch(rhit.REDIS_URL + '/dislike?username=' + rhit.currUserUsername())
+				.then(response => response.json())
+				.then((data) => {
+					for (let val of data.returnValue) {
+						rhit.GetGameInfo(val).then(retData => {
+							$('#dislikedOptList').append($('<option>', {
+								value: retData._id,
+								text: retData.game_title
+							}));
+						});
+					}
+				});
+		});
+
+		$("#deleteDislikeModal").on("hide.bs.modal", (event) => {
+			$('#dislikedOptList').empty()
+		});
+
+		document.querySelector("#deleteDislikedGame").addEventListener("click", (event) => {
+			let game = document.querySelector("#dislikedOptList").value;
+			let username = rhit.currUserUsername();
+			let data = { username, gameID: game };
+
+			fetch(rhit.REDIS_URL + '/dislike', {
+				method: "DELETE",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(data)
+			}).then(response => response.json())
+				.then((data) => {
+					if (data) location.reload();
+				});
+		});
+
 		document.querySelector("#submitDislikedGame").addEventListener("click", (event) => {
 			let game = document.querySelector("#gameOptList").value;
 			const username = rhit.currUserUsername();
@@ -122,6 +158,56 @@ rhit.MainPageController = class {
 
 		$("#addLikedModal").on("hide.bs.modal", (event) => {
 			$('#gameOptListLiked').empty()
+		});
+
+		$("#deleteLikeModal").on("show.bs.modal", (event) => {
+			// pre animation
+			fetch(rhit.REDIS_URL + '/like?username=' + rhit.currUserUsername())
+				.then(response => response.json())
+				.then((data) => {
+					for (let val of data.returnValue) {
+						rhit.GetGameInfo(val).then(retData => {
+							$('#likedOptList').append($('<option>', {
+								value: retData._id,
+								text: retData.game_title
+							}));
+						});
+					}
+				});
+		});
+
+		$("#deleteLikeModal").on("hide.bs.modal", (event) => {
+			$('#likedOptList').empty()
+		});
+
+		document.querySelector("#deleteDislikedGame").addEventListener("click", (event) => {
+			let game = document.querySelector("#dislikedOptList").value;
+			let username = rhit.currUserUsername();
+			let data = { username, gameID: game };
+
+			fetch(rhit.REDIS_URL + '/dislike', {
+				method: "DELETE",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(data)
+			}).then(response => response.json())
+				.then((data) => {
+					if (data) location.reload();
+				});
+		});
+
+		document.querySelector("#deleteLikedGame").addEventListener("click", (event) => {
+			let game = document.querySelector("#likedOptList").value;
+			let username = rhit.currUserUsername();
+			let data = { username, gameID: game };
+
+			fetch(rhit.REDIS_URL + '/like', {
+				method: "DELETE",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(data)
+			}).then(response => response.json())
+				.then((data) => {
+					if (data) location.reload();
+				});
 		});
 
 		document.querySelector("#submitDislikedGame").addEventListener("click", (event) => {
