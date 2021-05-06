@@ -35,6 +35,12 @@ async function createGame(game_id, title, perc_rec, n_reviewers, game_img_url, o
     return res;
 }
 
+async function getGameByID(id) {
+    let game = await Games.findById(id);
+
+    return game;
+}
+
 // might want to improve this with some Regex or partial search or something instead of having to do exact match
 async function getGamesByTitle(title) {
     let games = await Games.find({ game_title: title });
@@ -78,6 +84,7 @@ module.exports = {
     getAllGames,
     createGame,
     getGamesByTitle,
+    getGameByID,
     filterGamesByPercentRecommended,
     filterGamesByNumReviewers,
     sortGamesByTitle,

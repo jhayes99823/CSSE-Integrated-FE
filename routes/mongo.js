@@ -21,7 +21,16 @@ router.get('/game', (req, res) => {
             res.json({ returnValue: result });
         });
     }
-})
+});
+
+router.get('/game/:id', (req, res) => {
+    const { id } = req.params;
+
+    ops.getGameByID(id)
+        .then((result) => {
+            res.json({ returnValue: result });
+        });
+});
 
 router.post('/game', (req, res) => {
     const { game_title, percent_recommended, game_img_url, num_reviewers } = req.body;
