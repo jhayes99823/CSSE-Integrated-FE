@@ -15,16 +15,72 @@
     <a class="navbar-brand" href="#">App Name</a>
   </nav>
   <div id="mainPage" class="container page-container">
-    MAIN PAGE
-    LIKED GAMES
+    <p>Main Page</p>
+    <br>
+    <p>LIKED GAMES</p>
+    <button type="button" id="add-liked" class="btn bmd-btn-fab" data-toggle="modal" data-target="#addLikedModal">
+      <i class=" material-icons">add</i>
+    </button>
     <div id="card-container" class="container">
       <div id="itemRow-like" class="row"></div>
 
     </div>
-    DISLIKED GAMES
+    <br>
+    <p>DISLIKED GAMES</p>
+    <button type="button" id="add-disliked" class="btn bmd-btn-fab" data-toggle="modal" data-target="#addDislikeModal">
+      <i class="material-icons">add</i>
+    </button>
     <div id="card-container" class="container">
       <div id="itemRow-dislike" class="row"></div>
 
+    </div>
+  </div>
+
+  <!-- Add Dislike Modal -->
+  <div class="modal fade" id="addDislikeModal" tabindex="-1" role="dialog" aria-labelledby="Add dislike to your list"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Add Game to Dislike List</h5>
+        </div>
+        <div class="modal-body">
+          <div class="form-group bmd-form-group">
+            <label for="gameOptList" class="bmd-label-floating">Games</label>
+            <select class="form-select form-control" id="gameOptList" aria-label="Default select example">
+              <option selected value="0">Select item category</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">CANCEL</button>
+          <button type="button" id="submitDislikedGame" class="btn btn-primary" data-dismiss="modal">ADD</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Like Modal -->
+  <div class="modal fade" id="addLikedModal" tabindex="-1" role="dialog" aria-labelledby="Add like to your list"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Add Game to Liked List</h5>
+        </div>
+        <div class="modal-body">
+          <div class="form-group bmd-form-group">
+            <label for="gameOptListLiked" class="bmd-label-floating">Games</label>
+            <select class="form-select form-control" id="gameOptListLiked" aria-label="Default select example">
+              <option selected value="0">Select item category</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">CANCEL</button>
+          <button type="button" id="submitLikedGame" class="btn btn-primary" data-dismiss="modal">ADD</button>
+        </div>
+      </div>
     </div>
   </div>
   <script src="scripts/jquery.min.js"></script>

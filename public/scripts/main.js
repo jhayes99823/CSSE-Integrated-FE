@@ -67,6 +67,97 @@ rhit.MainPageController = class {
 	constructor() {
 		console.log('im the main page controller');
 
+		this.getLikedList()
+		this.getDislikedList();
+
+		$("#addDislikeModal").on("show.bs.modal", (event) => {
+			console.log('made it here');
+			// pre animation
+			fetch(rhit.MONGO_URL + '/game')
+				.then(response => response.json())
+				.then((data) => {
+					$.each(data.returnValue, function (i, item) {
+						$('#gameOptList').append($('<option>', {
+							value: item._id,
+							text: item.game_title
+						}));
+					});
+				});
+		});
+
+		$("#addDislikeModal").on("hide.bs.modal", (event) => {
+			$('#gameOptList').empty()
+		});
+
+		document.querySelector("#submitDislikedGame").addEventListener("click", (event) => {
+			let game = document.querySelector("#gameOptList").value;
+			const username = rhit.currUserUsername();
+			const data = { username, gameID: game };
+
+			fetch(rhit.REDIS_URL + '/dislike', {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(data)
+			})
+				.then(response => response.json())
+				.then((data) => {
+					if (data) location.reload();
+				});
+		});
+
+		$("#addLikedModal").on("show.bs.modal", (event) => {
+			console.log('made it here   liked');
+			// pre animation
+			fetch(rhit.MONGO_URL + '/game')
+				.then(response => response.json())
+				.then((data) => {
+					$.each(data.returnValue, function (i, item) {
+						$('#gameOptListLiked').append($('<option>', {
+							value: item._id,
+							text: item.game_title
+						}));
+					});
+				});
+		});
+
+		$("#addLikedModal").on("hide.bs.modal", (event) => {
+			$('#gameOptListLiked').empty()
+		});
+
+		document.querySelector("#submitDislikedGame").addEventListener("click", (event) => {
+			let game = document.querySelector("#gameOptList").value;
+			const username = rhit.currUserUsername();
+			const data = { username, gameID: game };
+
+			fetch(rhit.REDIS_URL + '/dislike', {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(data)
+			})
+				.then(response => response.json())
+				.then((data) => {
+					if (data) location.reload();
+				});
+		});
+
+		document.querySelector("#submitLikedGame").addEventListener("click", (event) => {
+			let game = document.querySelector("#gameOptListLiked").value;
+			const username = rhit.currUserUsername();
+			const data = { username, gameID: game };
+
+			fetch(rhit.REDIS_URL + '/like', {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(data)
+			})
+				.then(response => response.json())
+				.then((data) => {
+					if (data) location.reload();
+				});
+		});
+	}
+
+	getLikedList() {
 		const newList = htmlToElement('<div id="itemRow-like" class="row"> </div>');
 
 		fetch(rhit.REDIS_URL + '/like?username=' + rhit.currUserUsername())
@@ -92,6 +183,32 @@ rhit.MainPageController = class {
 		oldList.parentElement.appendChild(newList);
 	}
 
+	getDislikedList() {
+		const newList = htmlToElement('<div id="itemRow-dislike" class="row"> </div>');
+
+		fetch(rhit.REDIS_URL + '/dislike?username=' + rhit.currUserUsername())
+			.then(response => response.json())
+			.then((data) => {
+				console.log('data   ', data);
+				console.log('data.resultValue   ', data.returnValue);
+				for (let val of data.returnValue) {
+					rhit.GetGameInfo(val).then(retData => {
+						const newCard = this._createCard(retData);
+
+						newList.appendChild(newCard);
+					});
+				}
+			});
+
+		// remove old quoteListContainer
+		const oldList = document.querySelector("#itemRow-dislike");
+		oldList.removeAttribute("id");
+		oldList.hidden = true;
+
+		// put in new quoteListContainer
+		oldList.parentElement.appendChild(newList);
+	}
+
 	_createCard(item) {
 		console.log('item info  ', item);
 		return htmlToElement(`
@@ -104,14 +221,6 @@ rhit.MainPageController = class {
 			  data-holder-rendered="true" />
                 <div class="card-body">
                   <p class="card-text">${item.game_title} - ${item.percent_recommended} - ${item.num_reviewers}</p>
-                  <div class="d-flex justify-content-between align-items-center">
-                    <div class="btn-group">
-                      <button type="button" class="btn btn-sm more-details">
-                        More Details
-                      </button>
-					</div>
-						
-					</div>
                 </div>
               </div>
 			</div>
