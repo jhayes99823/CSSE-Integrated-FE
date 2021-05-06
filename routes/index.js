@@ -2,8 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const mongoRoutes = require('./mongo');
-// import pileRoutes from "./pile";
-// import playerRoutes from "./player";
+const redisRoutes = require('./redis');
 
 router.get("/", (req, res) => {
     res.json({
@@ -13,7 +12,6 @@ router.get("/", (req, res) => {
 });
 
 router.use("/mongo", mongoRoutes);
-// router.use("/pile", pileRoutes);
-// router.use("/player", playerRoutes);
+router.use("/redis", redisRoutes);
 
 module.exports = router;
