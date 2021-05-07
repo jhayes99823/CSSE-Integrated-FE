@@ -23,6 +23,46 @@ router.get('/game', (req, res) => {
     }
 });
 
+router.get('/game/sort', (req, res) => {
+    const { order, field } = req.query;
+
+    if (field == "TITLE") {
+        ops.sortGamesByTitle(parseInt(order))
+            .then((result) => {
+                res.json({ returnValue: result });
+            });
+    }
+    if (field == "PERCENT_RECOMMENDED") {
+        ops.sortGamesByPercentRecommended(parseInt(order))
+            .then((result) => {
+                res.json({ returnValue: result });
+            });
+    }
+    if (field == "NUM_REVIEWERS") {
+        ops.sortGamesByNumReviwers(parseInt(order))
+            .then((result) => {
+                res.json({ returnValue: result });
+            });
+    }
+});
+
+router.get('/game/filter', (req, res) => {
+    const { min, max, field } = req.query;
+
+    if (field == "NUM_REVIEWERS") {
+        ops.filterGamesByNumReviewers(min, max)
+            .then((result) => {
+                res.json({ returnValue: result });
+            });
+    }
+    if (field == "PERCENT_RECOMMENDED") {
+        ops.filterGamesByPercentRecommended(min, max)
+            .then((result) => {
+                res.json({ returnValue: result });
+            });
+    }
+});
+
 router.get('/game/:id', (req, res) => {
     const { id } = req.params;
 

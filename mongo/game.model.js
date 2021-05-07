@@ -8,7 +8,7 @@ let Game = new Schema({
     percent_recommended: {
         type: Number
     },
-    num_reviwers: {
+    num_reviewers: {
         type: Number
     },
     game_img_url: {

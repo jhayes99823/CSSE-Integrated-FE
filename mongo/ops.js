@@ -27,7 +27,7 @@ async function createGame(game_id, title, perc_rec, n_reviewers, game_img_url, o
         game_title: title,
         percent_recommended: perc_rec,
         num_reviewers: n_reviewers,
-        game_image_url: game_img_url
+        game_img_url
     });
 
     let res = await newGame.save();
@@ -49,34 +49,39 @@ async function getGamesByTitle(title) {
     return games;
 }
 
-async function filterGamesByPercentRecommended(perc) {
-    let games = await Games.find({ percent_recommended: perc });
+async function filterGamesByPercentRecommended(min, max) {
+    let games = [];
+    if (min == max) {
+        games = await Games.find({ percent_recommended: { $gt: min } });
+    } else {
+        games = await Games.find({ percent_recommended: { $gt: min, $lt: max } });
+    }
     return games;
 }
 
-async function filterGamesByNumReviewers(nr) {
-    let games = await Games.find({ num_reviewers: nr });
+async function filterGamesByNumReviewers(min, max) {
+    let games = [];
+    if (min == max) {
+        games = await Games.find({ num_reviewers: { $gt: min } });
+    } else {
+        games = await Games.find({ num_reviewers: { $gt: min, $lt: max } });
+    }
     return games;
 }
 
-async function sortGamesByTitle() {
-    let games = await Games.aggregate([{ $sort: { title: -1 } }]);
+async function sortGamesByTitle(order) {
+    let games = await Games.aggregate([{ $sort: { game_title: order } }]);
     return games;
 }
 
-async function sortGamesByPercentRecommended() {
-    let games = await Games.aggregate([{ $sort: { title: -1 } }]);
+async function sortGamesByPercentRecommended(order) {
+    let games = await Games.aggregate([{ $sort: { percent_recommended: order } }]);
     return games;
 }
 
-async function sortGamesByNumReviwers() {
-    let games = await Games.aggregate([{ $sort: { num_reviewers: -1 } }]);
+async function sortGamesByNumReviwers(order) {
+    let games = await Games.aggregate([{ $sort: { num_reviewers: order } }]);
     return games;
-}
-
-async function updateGameTitle(gid, new_title) {
-    let result = await Games.update_one({ _id: gid }, { $set: { title: new_title } });
-    return result;
 }
 
 module.exports = {
@@ -89,6 +94,5 @@ module.exports = {
     filterGamesByNumReviewers,
     sortGamesByTitle,
     sortGamesByPercentRecommended,
-    sortGamesByNumReviwers,
-    updateGameTitle
+    sortGamesByNumReviwers
 }

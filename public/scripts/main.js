@@ -70,6 +70,11 @@ rhit.MainPageController = class {
 		this.getLikedList()
 		this.getDislikedList();
 
+		document.querySelector('#logout-btn').addEventListener("click", (event) => {
+			localStorage.removeItem(rhit.CURR_USER_KEY);
+			rhit.checkForRedirects();
+		});
+
 		$("#addDislikeModal").on("show.bs.modal", (event) => {
 			console.log('made it here');
 			// pre animation
