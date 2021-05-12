@@ -1,9 +1,12 @@
 const asyncRedis = require('async-redis');
 const bcrypt = require('bcryptjs')
-const client = asyncRedis.createClient({ port: 6700 });
+const client = asyncRedis.createClient({ port: process.env.REDIS_PORT });
+const constants = require('../common/constants');
 
 const USER_LIKED_BASE = '_LIKED';
 const USER_DISLIKED_BASE = '_DISLIKED';
+const USERNAME_KEY = 'username';
+const PASSWORD_KEY = 'password';
 
 function saltPassword(password) {
     var salt = bcrypt.genSaltSync(10);
@@ -17,13 +20,13 @@ async function createUser(username, password) {
     let user = await client.exists(username);
 
     if (user) {
-        console.log('user already exists');
-        return 'User already exists';
+        console.log(constants.USER_ALREADY_EXISTS);
+        return constants.USER_ALREADY_EXISTS;
     }
 
     let hashed = saltPassword(password);
 
-    let result = await client.hset(username, 'username', username, 'password', hashed);
+    let result = await client.hset(username, USERNAME_KEY, username, PASSWORD_KEY, hashed);
 
     return result == 2 ? true : false;
 }
@@ -33,14 +36,14 @@ async function updateUsername(oldusername, newusername) {
     let user = await client.exists(oldusername);
 
     if (!user) {
-        console.log('user not found');
-        return 'User not found';
+        console.log(constants.USER_NOT_FOUND);
+        return constants.USER_NOT_FOUND;
     }
 
     let newUser = await client.exists(newusername);
     if (newUser) {
-        console.log('user already exists');
-        return 'User already exists';
+        console.log(constants.USER_ALREADY_EXISTS);
+        return constants.USER_ALREADY_EXISTS
     }
 
     let userPassword = await client.hget(oldusername, PASSWORK_KEY);
@@ -58,12 +61,58 @@ async function getUser(username) {
     return userToReturn;
 }
 
+// update password
+async function updatePassword(username, oldpassword, newpassword) {
+    // check if user exists
+    let user = await client.exists(username);
+
+    if (!user) {
+        console.log(constants.USER_NOT_FOUND);
+        return constants.USER_NOT_FOUND;
+    }
+
+    // check if old passwords match
+    let hashedOld = saltPassword(oldpassword);
+
+    let userPassword = await client.hget(username, PASSWORK_KEY);
+    if (userPassword != hashedOld) {
+        console.log(constants.USER_NOT_FOUND + "password part");
+        return constants.USER_NOT_FOUND;
+    }
+
+    // check if new password matches old password
+    let currPassword = await client.hget(username, PASSWORD_KEY);
+
+    if (currPassword == newpassword) {
+        return constants.NEW_MATCHING_PASSWORD;
+    }
+
+    // set new password
+    let hashedNew = saltPassword(newpassword);
+
+    let newUser = createUser(username, hashedNew);
+    return newUser;
+}
+
+// delete user by username
+async function deleteUser(username) {
+    let user = await client.exists(username);
+
+    if (!user) {
+        console.log(constants.USER_NOT_FOUND);
+        return constants.USER_NOT_FOUND;
+    }
+
+    let retVal = await client.del(username);
+    return retVal;
+}
+
 async function login(username, password) {
     let user = await client.exists(username);
 
     if (!user) {
-        console.log('user not found');
-        return 'User not found';
+        console.log(constants.USER_NOT_FOUND);
+        return constants.USER_NOT_FOUND;
     }
 
     let userToReturn = await client.hgetall(username);
@@ -88,14 +137,20 @@ async function getDislikedGamesByUserId(userId, low = 0, high = -1) {
 }
 
 async function addGamesToLikedList(steamID, gameID) {
-    let gameList = await client.sadd(steamID + USER_LIKED_BASE, gameID);
+    let checkGameExistanceInDisliked = checkIfGameExistsInList(steamID, gameID, 'DISLIKE');
 
-    if (gameList == 1) {
-        console.log('Game Successfully ADDED')
-        return true;
+    if (!checkGameExistanceInDisliked) {
+        let gameList = await client.sadd(steamID + USER_LIKED_BASE, gameID);
+
+        if (gameList == 1) {
+            console.log(constants.GAME_ADDED)
+            return true;
+        } else {
+            console.log(constants.GAME_ALREADY_EXISTS)
+            return false;
+        }
     } else {
-        console.log('ERROR: Game already exists in set')
-        return false;
+        return constants.GAME_CROSSOVER;
     }
 }
 
@@ -103,23 +158,29 @@ async function deleteGameFromLikedList(steamID, gameID) {
     let gameList = await client.srem(steamID + USER_LIKED_BASE, gameID);
 
     if (gameList == 1) {
-        console.log('Game Successfully REMOVED')
+        console.log(constants.GAME_REMOVED)
         return true;
     } else {
-        console.log('ERROR: Game does not exist in set')
+        console.log(constants.GAME_NOT_FOUND)
         return false;
     }
 }
 
 async function addGameToDislikedList(steamID, gameID) {
-    let gameList = await client.sadd(steamID + USER_DISLIKED_BASE, gameID);
+    let checkGameExistanceInLiked = checkIfGameExistsInList(steamID, gameID, 'LIKED');
 
-    if (gameList == 1) {
-        console.log('Game Successfully ADDED')
-        return true;
+    if (!checkGameExistanceInLiked) {
+        let gameList = await client.sadd(steamID + USER_DISLIKED_BASE, gameID);
+
+        if (gameList == 1) {
+            console.log(constants.GAME_ADDED)
+            return true;
+        } else {
+            console.log(constants.GAME_ALREADY_EXISTS)
+            return false;
+        }
     } else {
-        console.log('ERROR: Game already exists in set')
-        return false;
+        return constants.GAME_CROSSOVER;
     }
 }
 
@@ -127,12 +188,24 @@ async function deleteGameFromDislikedList(steamID, gameID) {
     let gameList = await client.srem(steamID + USER_DISLIKED_BASE, gameID);
 
     if (gameList == 1) {
-        console.log('Game Successfully REMOVED')
+        console.log(constants.GAME_REMOVED)
         return true;
     } else {
-        console.log('ERROR: Game does not exist in set')
+        console.log(constants.GAME_NOT_FOUND)
         return false;
     }
+}
+
+async function checkIfGameExistsInList(steamID, gameID, listType) {
+    let retVal = null;
+
+    if (listType === 'LIKED') {
+        retVal = await client.sismember(steamID + USER_LIKED_BASE, gameID);
+    } else {
+        retVal = await client.sismember(steamID + USER_DISLIKED_BASE, gameID);
+    }
+
+    return retVal == 1 ? true : false;
 }
 
 module.exports = {
@@ -145,5 +218,7 @@ module.exports = {
     addGamesToLikedList,
     addGameToDislikedList,
     deleteGameFromLikedList,
-    deleteGameFromDislikedList
+    deleteGameFromDislikedList,
+    updatePassword,
+    deleteUser
 }

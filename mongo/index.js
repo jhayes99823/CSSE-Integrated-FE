@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
-const server = '127.0.0.1:27017';       // REPLACE WITH YOUR DB SERVER
-const database = 'steam_reviews';        // REPLACE WITH YOUR DB NAME
+const server = process.env.MONGO_SERVER;       // REPLACE WITH YOUR DB SERVER
+const database = process.env.MONGO_DATABASE;        // REPLACE WITH YOUR DB NAME
 const dbURI = `mongodb://${server}/${database}`;
 
 class Database {

@@ -1,6 +1,7 @@
 const ops = require('../mongo/ops');
 const express = require('express');
 const router = express.Router();
+const constants = require('../common/constants');
 
 router.get('/review', (req, res) => {
     ops.getAllReviews().then((result) => {
@@ -26,19 +27,19 @@ router.get('/game', (req, res) => {
 router.get('/game/sort', (req, res) => {
     const { order, field } = req.query;
 
-    if (field == "TITLE") {
+    if (field == constants.TITLE) {
         ops.sortGamesByTitle(parseInt(order))
             .then((result) => {
                 res.json({ returnValue: result });
             });
     }
-    if (field == "PERCENT_RECOMMENDED") {
+    if (field == constants.PERCENT_RECOMMENDED) {
         ops.sortGamesByPercentRecommended(parseInt(order))
             .then((result) => {
                 res.json({ returnValue: result });
             });
     }
-    if (field == "NUM_REVIEWERS") {
+    if (field == constants.NUM_REVIWERS) {
         ops.sortGamesByNumReviwers(parseInt(order))
             .then((result) => {
                 res.json({ returnValue: result });
@@ -49,13 +50,13 @@ router.get('/game/sort', (req, res) => {
 router.get('/game/filter', (req, res) => {
     const { min, max, field } = req.query;
 
-    if (field == "NUM_REVIEWERS") {
+    if (field == constants.NUM_REVIWERS) {
         ops.filterGamesByNumReviewers(min, max)
             .then((result) => {
                 res.json({ returnValue: result });
             });
     }
-    if (field == "PERCENT_RECOMMENDED") {
+    if (field == constants.PERCENT_RECOMMENDED) {
         ops.filterGamesByPercentRecommended(min, max)
             .then((result) => {
                 res.json({ returnValue: result });

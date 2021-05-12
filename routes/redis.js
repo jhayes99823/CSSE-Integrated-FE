@@ -10,6 +10,22 @@ router.post('/user', (req, res) => {
         });
 });
 
+router.post('/user/username', (req, res) => {
+    const { currUsername, newUsername } = req.body;
+    ops.updateUsername(currUsername, newUsername)
+        .then((result) => {
+            res.json({ returnValue: result });
+        });
+});
+
+router.post('/user/password', (req, res) => {
+    const { username, oldpassword, newpassword } = req.body;
+    ops.updatePassword(username, oldpassword, newpassword)
+        .then((result) => {
+            res.json({ returnValue: result });
+        });
+});
+
 router.get('/user', (req, res) => {
     const { username } = req.query;
 
