@@ -39,6 +39,25 @@
   <div id="mainPage" class="container page-container">
     <p>Main Page</p>
     <div id="alert-section" role="alert"></div>
+    <p>ALL GAMES </p>
+    <div>
+      <button type="button" id="filter-btn" class="btn bmd-btn-fab" data-toggle="modal" data-target="#filterGamesModal">
+        <i class="material-icons">filter_alt</i>
+      </button>
+      <button type="button" id="search-btn" class="btn" data-toggle="modal" data-target="#searchGameModel">
+        <i class="material-icons">search</i>
+      </button>
+      <button type="button" id="sort-btn" class="btn bmd-btn-fab" data-toggle="modal" data-target="#sortGamesModal">
+        <i class="material-icons">sort</i>
+      </button>
+      <button type="button" id="clear-btn" class="btn">
+        <i class="material-icons">clear</i>
+      </button>
+    </div>
+    <div id="card-container" class="container">
+      <div id="itemRow-all" class="row"></div>
+
+    </div>
     <br>
     <p>LIKED GAMES</p>
     <button type="button" id="add-liked" class="btn bmd-btn-fab" data-toggle="modal" data-target="#addLikedModal">
@@ -63,6 +82,110 @@
     <div id="card-container" class="container">
       <div id="itemRow-dislike" class="row"></div>
 
+    </div>
+  </div>
+
+  <!-- Search Game Modal-->
+  <div class="modal fade" id="searchGameModel" tabindex="-1" role="dialog" aria-labelledby="Search Game By Title"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Search Game By Title</h5>
+        </div>
+        <div class="modal-body">
+          <div class="modal-body">
+            <div class="form-group bmd-form-group">
+              <label for="titleField" class="bmd-label-floating">Title</label>
+              <input type="text" class="form-control" id="titleField">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">CANCEL</button>
+          <button type="button" id="submitTitleSearch" class="btn btn-primary" data-dismiss="modal">SEARCH</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Games Modal -->
+  <div class="modal fade" id="filterGamesModal" tabindex="-1" role="dialog" aria-labelledby="Filter Games"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Filter Games</h5>
+        </div>
+        <div class="modal-body">
+          <div class="custom-control custom-radio">
+            <input type="radio" value="PERCENT_RECOMMENDED" id="percRec" name="filterName" class="custom-control-input">
+            <label class="custom-control-label" for="percRec">Percent Recommended</label>
+          </div>
+          <div class="custom-control custom-radio">
+            <input type="radio" value="NUM_REVIEWERS" id="numRevs" name="filterName" class="custom-control-input">
+            <label class="custom-control-label" for="numRevs">Number of Reviewers</label>
+          </div>
+        </div>
+        <div>
+          <div class="form-group bmd-form-group">
+            <label for="minInput" class="bmd-label-floating">Min Input</label>
+            <input type="number" class="form-control" id="minInput" value="0">
+          </div>
+          <div class="form-group bmd-form-group">
+            <label for="maxInput" class="bmd-label-floating">Max Input</label>
+            <input type="number" class="form-control" id="maxInput" value="0">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">CANCEL</button>
+          <button type="button" id="submitFilterOptions" class="btn btn-primary" data-dismiss="modal">FILTER</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sort Games Modal -->
+  <div class="modal fade" id="sortGamesModal" tabindex="-1" role="dialog" aria-labelledby="Sort Games"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Sort Games</h5>
+        </div>
+        <div class="modal-body">
+          <div>
+            <h5>Field</h5>
+            <div class="custom-control custom-radio">
+              <input type="radio" value="PERCENT_RECOMMENDED" id="percRecSort" name="sortName"
+                class="custom-control-input">
+              <label class="custom-control-label" for="percRecSort">Percent Recommended</label>
+            </div>
+            <div class="custom-control custom-radio">
+              <input type="radio" value="NUM_REVIEWERS" id="numReviwersSort" name="sortName"
+                class="custom-control-input">
+              <label class="custom-control-label" for="numReviwersSort">Number of Reviewers</label>
+            </div>
+            <div class="custom-control custom-radio">
+              <input type="radio" value="TITLE" id="title" name="sortName" class="custom-control-input">
+              <label class="custom-control-label" for="title">Title</label>
+            </div>
+          </div>
+          <h5>Order</h5>
+          <div class="custom-control custom-radio">
+            <input type="radio" value="-1" id="dec" name="orderName" class="custom-control-input">
+            <label class="custom-control-label" for="dec">Descending</label>
+          </div>
+          <div class="custom-control custom-radio">
+            <input type="radio" value="1" id="asc" name="orderName" class="custom-control-input">
+            <label class="custom-control-label" for="asc">Ascending</label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">CANCEL</button>
+          <button type="button" id="submitSortOptions" class="btn btn-primary" data-dismiss="modal">SORT</button>
+        </div>
+      </div>
     </div>
   </div>
 

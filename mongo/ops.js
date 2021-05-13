@@ -43,7 +43,7 @@ async function getGameByID(id) {
 
 // might want to improve this with some Regex or partial search or something instead of having to do exact match
 async function getGamesByTitle(title) {
-    let games = await Games.find({ game_title: title });
+    let games = await Games.find({ game_title: { $regex: `.*${title}.*` } });
 
     // console.log('Games with title - ', title, '\n', games);
     return games;

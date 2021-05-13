@@ -116,6 +116,7 @@ rhit.MainPageController = class {
 	constructor() {
 		console.log('im the main page controller');
 
+		this.getAllGames();
 		this.getLikedList()
 		this.getDislikedList();
 
@@ -404,6 +405,120 @@ rhit.MainPageController = class {
 					rhit.checkForRedirects();
 				})
 		});
+
+		document.querySelector("#submitFilterOptions").addEventListener('click', (event) => {
+			let min = document.querySelector("#minInput").value;
+			let max = document.querySelector("#maxInput").value;
+			let field = $("input[name='filterName']:checked").val();
+
+			console.log('field ', field);
+			fetch(rhit.MONGO_URL + '/game/filter?field=' + field + "&min=" + min + "&max=" + max)
+				.then(response => response.json())
+				.then((data) => {
+					const newList = htmlToElement('<div id="itemRow-all" class="row"> </div>');
+
+					for (let val of data.returnValue) {
+						rhit.GetGameInfo(val._id).then(retData => {
+							const newCard = this._createCard(retData);
+
+							newList.appendChild(newCard);
+						})
+					}
+
+					// remove old quoteListContainer
+					const oldList = document.querySelector("#itemRow-all");
+					oldList.removeAttribute("id");
+					oldList.hidden = true;
+
+					// put in new quoteListContainer
+					oldList.parentElement.appendChild(newList);
+				})
+		});
+
+		document.querySelector("#submitSortOptions").addEventListener('click', (event) => {
+			let field = $("input[name='sortName']:checked").val();
+			let order = $("input[name='orderName']:checked").val();
+
+			console.log('field ', field);
+			fetch(rhit.MONGO_URL + '/game/sort?field=' + field + "&order=" + order)
+				.then(response => response.json())
+				.then((data) => {
+					const newList = htmlToElement('<div id="itemRow-all" class="row"> </div>');
+
+					for (let val of data.returnValue) {
+						rhit.GetGameInfo(val._id).then(retData => {
+							const newCard = this._createCard(retData);
+
+							newList.appendChild(newCard);
+						})
+					}
+
+					// remove old quoteListContainer
+					const oldList = document.querySelector("#itemRow-all");
+					oldList.removeAttribute("id");
+					oldList.hidden = true;
+
+					// put in new quoteListContainer
+					oldList.parentElement.appendChild(newList);
+				})
+		});
+
+		document.querySelector("#submitTitleSearch").addEventListener('click', (event) => {
+			let title = document.querySelector("#titleField").value;
+
+			fetch(rhit.MONGO_URL + '/game?title=' + title)
+				.then(response => response.json())
+				.then((data) => {
+					const newList = htmlToElement('<div id="itemRow-all" class="row"> </div>');
+
+					for (let val of data.returnValue) {
+						rhit.GetGameInfo(val._id).then(retData => {
+							const newCard = this._createCard(retData);
+
+							newList.appendChild(newCard);
+						})
+					}
+
+					// remove old quoteListContainer
+					const oldList = document.querySelector("#itemRow-all");
+					oldList.removeAttribute("id");
+					oldList.hidden = true;
+
+					// put in new quoteListContainer
+					oldList.parentElement.appendChild(newList);
+				})
+		});
+
+		document.querySelector("#clear-btn").addEventListener('click', (event) => {
+			this.getAllGames();
+		});
+	}
+
+	getAllGames() {
+		const newList = htmlToElement('<div id="itemRow-all" class="row"> </div>');
+
+		fetch(rhit.MONGO_URL + '/game')
+			.then(response => response.json())
+			.then((data) => {
+				console.log('data   ', data);
+				console.log('data.resultValue   ', data.returnValue);
+				for (let val of data.returnValue) {
+					console.log('ALL GAMES:   ', val._id);
+					rhit.GetGameInfo(val._id).then(retData => {
+						const newCard = this._createCard(retData);
+
+						newList.appendChild(newCard);
+					});
+				}
+			});
+
+		// remove old quoteListContainer
+		const oldList = document.querySelector("#itemRow-all");
+		oldList.removeAttribute("id");
+		oldList.hidden = true;
+
+		// put in new quoteListContainer
+		oldList.parentElement.appendChild(newList);
 	}
 
 	getLikedList() {
