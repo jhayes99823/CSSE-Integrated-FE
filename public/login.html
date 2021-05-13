@@ -15,7 +15,9 @@
         <a class="navbar-brand" href="#">Steam</a>
     </nav>
     <div id="loginPage" class="container page-container">
-        <h1 id="login-header">Login</h1>
+        <div id="alert-section" role="alert">
+        </div>
+        <h1 id="login-header">Account</h1>
 
         <div id="login-error-msg-holder">
             <p id="login-error-msg">Invalid username <span id="error-msg-second-line">and/or password</span></p>
@@ -25,10 +27,13 @@
             <input type="text" name="username" id="username-field" class="login-form-field" placeholder="Username">
             <input type="password" name="password" id="password-field" class="login-form-field" placeholder="Password">
             <input type="button" value="Login" id="login-btn">
+            or
+            <input type="button" value="Create Account" id="create-account-btn">
         </div>
     </div>
     <script src="scripts/jquery.min.js"></script>
     <script src="scripts/popper.js"></script>
+    <script src="https://cdn.rawgit.com/FezVrasta/snackbarjs/1.1.0/dist/snackbar.min.js"></script>
     <script src="scripts/bootstrap-material-design.js"></script>
     <script>$("body").bootstrapMaterialDesign();</script>
     <script src="scripts/main.js"></script>

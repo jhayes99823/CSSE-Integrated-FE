@@ -54,10 +54,59 @@ rhit.LoginPageController = class {
 					console.log('data.returnValue.username,   ', data.returnValue.username);
 					if (data.returnValue.username) {
 						const retData = JSON.stringify(data.returnValue);
-						localStorage.setItem(rhit.CURR_USER_KEY, retData);
+						localStorage.setItem(rhit.CURR_USER_KEY, data.returnValue.username);
+					} else {
+						console.log('error happened ', data.returnValue);
+						$("#alert-section").html(`
+							<div class="alert alert-warning alert-dismissible fade show" role="alert">
+								<p>${data.returnValue}</p>
+								<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+						`)
 					}
 				}).then(() => {
 					rhit.checkForRedirects();
+				})
+		}
+
+		document.querySelector("#create-account-btn").onclick = (event) => {
+			const username = document.querySelector("#username-field");
+			const password = document.querySelector("#password-field");
+			const data = { "username": username.value, "password": password.value };
+
+			fetch(rhit.REDIS_URL + '/user', {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(data)
+			})
+				.then(response => response.json())
+				.then((data) => {
+					console.log('data  ', data);
+					console.log('data.resultValue  ', data.returnValue);
+					if (data.returnValue == true) {
+						// TODO add success banner
+						console.log('account created successfully');
+						$("#alert-section").html(`
+							<div class="alert alert-success alert-dismissible fade show" role="alert">
+								<p>Account Created Successfully</p>
+								<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+						`)
+					} else {
+						console.log('error happened ', data.returnValue);
+						$("#alert-section").html(`
+							<div class="alert alert-warning alert-dismissible fade show" role="alert">
+								<p>${data.returnValue}</p>
+								<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+						`)
+					}
 				})
 		}
 	}
@@ -114,6 +163,8 @@ rhit.MainPageController = class {
 		$("#deleteDislikeModal").on("hide.bs.modal", (event) => {
 			$('#dislikedOptList').empty()
 		});
+
+
 
 		document.querySelector("#deleteDislikedGame").addEventListener("click", (event) => {
 			let game = document.querySelector("#dislikedOptList").value;
@@ -246,6 +297,113 @@ rhit.MainPageController = class {
 					if (data) location.reload();
 				});
 		});
+
+		document.querySelector('#submitUpdateUsername').addEventListener('click', (event) => {
+			let currUsername = document.querySelector("#oldUsername").value;
+			let newUsername = document.querySelector("#newUsername").value;
+
+			const data = { currUsername, newUsername };
+
+			fetch(rhit.REDIS_URL + '/user/username', {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(data)
+			})
+				.then(response => response.json())
+				.then((data) => {
+					if (data.returnValue == true) {
+						console.log('i think im okay')
+						$("#alert-section").html(`
+							<div class="alert alert-success alert-dismissible fade show" role="alert">
+								<p>Username successfully updated!</p>
+								<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+						`)
+					} else {
+						console.log('error happened ', data.returnValue);
+						$("#alert-section").html(`
+							<div class="alert alert-warning alert-dismissible fade show" role="alert">
+								<p>${data.returnValue}</p>
+								<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+						`)
+					}
+				}).then(() => {
+					localStorage.setItem(rhit.CURR_USER_KEY, newUsername);
+				})
+		});
+
+		$("#updateUsernameModal").on("show.bs.modal", (event) => {
+			// pre animation
+			document.querySelector("#oldUsername").value = "";
+			document.querySelector("#newUsername").value = "";
+		});
+
+		document.querySelector('#submitUpdatePassword').addEventListener('click', (event) => {
+			let oldpassword = document.querySelector("#oldPassword").value;
+			let newpassword = document.querySelector("#newPassword").value;
+			let username = rhit.currUserUsername();
+
+			const data = { username, oldpassword, newpassword };
+
+			fetch(rhit.REDIS_URL + '/user/password', {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(data)
+			})
+				.then(response => response.json())
+				.then((data) => {
+					if (data.returnValue > -1) {
+						console.log('i think im okay')
+						$("#alert-section").html(`
+							<div class="alert alert-success alert-dismissible fade show" role="alert">
+								<p>Password successfully updated!</p>
+								<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+						`)
+					} else {
+						console.log('error happened ', data.returnValue);
+						$("#alert-section").html(`
+							<div class="alert alert-warning alert-dismissible fade show" role="alert">
+								<p>${data.returnValue}</p>
+								<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+						`)
+					}
+				});
+		});
+
+		$("#updatePasswordModal").on("show.bs.modal", (event) => {
+			// pre animation
+			document.querySelector("#oldPassword").value = "";
+			document.querySelector("#newPassword").value = "";
+		});
+
+		document.querySelector('#delete-account-btn').addEventListener('click', (event) => {
+			const username = rhit.currUserUsername();
+			const data = { username };
+
+			fetch(rhit.REDIS_URL + '/user', {
+				method: "DELETE",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(data)
+			})
+				.then(response => response.json())
+				.then((data) => {
+					if (data.returnValue == true) localStorage.removeItem(rhit.CURR_USER_KEY);
+				})
+				.then(() => {
+					rhit.checkForRedirects();
+				})
+		});
 	}
 
 	getLikedList() {
@@ -334,15 +492,7 @@ rhit.GetGameInfo = async function (id) {
 }
 
 rhit.currUserUsername = function () {
-	let user = JSON.parse(localStorage.getItem(rhit.CURR_USER_KEY));
-
-	return user.username;
-}
-
-rhit.currUserPassword = function () {
-	let user = JSON.parse(localStorage.getItem(rhit.CURR_USER_KEY));
-
-	return user.password;
+	return localStorage.getItem(rhit.CURR_USER_KEY);
 }
 
 rhit.checkForRedirects = function () {

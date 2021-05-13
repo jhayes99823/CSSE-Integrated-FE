@@ -13,10 +13,32 @@
 <body>
   <nav class="navbar navbar-dark fixed-top">
     <a class="navbar-brand" href="#">App Name</a>
-    <a id="logout-btn">Logout</a>
+    <ul>
+      <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="settingsDropdown" data-toggle="dropdown"
+          aria-haspopup="true" aria-expanded="false">
+          Settings <i class="material-icons">settings</i>
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+          <a class="dropdown-item" id="update-username-btn" data-toggle="modal"
+            data-target="#updateUsernameModal">Update
+            Username
+          </a>
+          <a class="dropdown-item" id="update-password-btn" data-toggle="modal"
+            data-target="#updatePasswordModal">Update
+            Password
+          </a>
+          <a class="dropdown-item" id="delete-account-btn">Delete
+            Account
+          </a>
+        </div>
+      </div>
+      <li class=" nav-item"><a id="logout-btn" class="nav-link">Logout</a></li>
+    </ul>
   </nav>
   <div id="mainPage" class="container page-container">
     <p>Main Page</p>
+    <div id="alert-section" role="alert"></div>
     <br>
     <p>LIKED GAMES</p>
     <button type="button" id="add-liked" class="btn bmd-btn-fab" data-toggle="modal" data-target="#addLikedModal">
@@ -135,6 +157,63 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">CANCEL</button>
           <button type="button" id="deleteLikedGame" class="btn btn-primary" data-dismiss="modal">DELETE</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Update Username Modal-->
+  <div class="modal fade" id="updateUsernameModal" tabindex="-1" role="dialog"
+    aria-labelledby="Update Username information" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Update Username for Account Information</h5>
+        </div>
+        <div class="modal-body">
+          <div class="modal-body">
+            <div class="form-group bmd-form-group">
+              <label for="oldUsername" class="bmd-label-floating">Old Username</label>
+              <input type="text" class="form-control" id="oldUsername">
+            </div>
+          </div>
+          <div class="form-group bmd-form-group">
+            <label for="newUsername" class="bmd-label-floating">New Username</label>
+            <input type="text" class="form-control" id="newUsername">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">CANCEL</button>
+          <button type="button" id="submitUpdateUsername" class="btn btn-primary" data-dismiss="modal">UPDATE</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Update Password Modal-->
+  <div class="modal fade" id="updatePasswordModal" tabindex="-1" role="dialog"
+    aria-labelledby="Update Password information" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Update Password for Account Information</h5>
+        </div>
+        <div class="modal-body">
+          <div class="form-group bmd-form-group">
+            <label for="oldPassword" class="bmd-label-floating">Old Password</label>
+            <input type="password" class="form-control" id="oldPassword">
+          </div>
+        </div>
+        <div class="modal-body">
+          <div class="form-group bmd-form-group">
+            <label for="newPassword" class="bmd-label-floating">New Password</label>
+            <input type="password" class="form-control" id="newPassword">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">CANCEL</button>
+          <button type="button" id="submitUpdatePassword" class="btn btn-primary" data-dismiss="modal">UPDATE</button>
         </div>
       </div>
     </div>

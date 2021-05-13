@@ -10,6 +10,15 @@ router.post('/user', (req, res) => {
         });
 });
 
+router.delete('/user', (req, res) => {
+    const { username } = req.body;
+
+    ops.deleteUser(username)
+        .then((result) => {
+            res.json({ returnValue: result });
+        });
+})
+
 router.post('/user/username', (req, res) => {
     const { currUsername, newUsername } = req.body;
     ops.updateUsername(currUsername, newUsername)
