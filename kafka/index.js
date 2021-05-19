@@ -2,43 +2,54 @@ const { Kafka } = require('kafkajs')
 
 const kafka = new Kafka({
     clientId: 'my-app',
-    brokers: ['kafka1:9092', 'kafka2:9092']
+    brokers: ['localhost:9092']
 })
 
 const producer = kafka.producer();
+const consumer = kafka.consumer({ groupId: 'test-group' });
 
 async function startProducer() {
-    await producer.connect()
-    await producer.send({
-        topic: 'test-topic',
-        messages: [
-            { value: 'Hello KafkaJS user!' },
-        ],
-    })
-
-    await producer.disconnect()
-
+    await producer.connect();
 }
 
-const consumer = kafka.consumer({ groupId: 'test-group' })
+// async function startProducer() {
+//     await producer.connect()
+//     await producer.send({
+//         topic: 'testTopic',
+//         messages: [
+//             { value: 'Hello KafkaJS user!' },
+//         ],
+//     })
 
-async function startConsumer() {
-    await consumer.connect()
-    await consumer.subscribe({ topic: 'test-topic', fromBeginning: true })
+//     await producer.disconnect()
 
-    console.log('made it here');
+// }
 
-    await consumer.run({
-        eachMessage: async ({ topic, partition, message }) => {
-            console.log({
-                value: message.value.toString(),
-            })
-        },
-    })
-}
 
-async function start() {
-    await startProducer();
+// async function startConsumer() {
+//     await consumer.connect()
+//     await consumer.subscribe({ topic: 'testTopic', fromBeginning: true })
 
-    await startConsumer();
+//     console.log('made it here');
+
+//     await consumer.run({
+//         eachMessage: async ({ topic, partition, message }) => {
+//             console.log({
+//                 value: message.value.toString(),
+//             })
+//         },
+//     })
+// }
+
+// async function start() {
+//     await startProducer();
+
+//     await startConsumer();
+// }
+
+// start();
+
+module.exports = {
+    producer,
+    consumer
 }
