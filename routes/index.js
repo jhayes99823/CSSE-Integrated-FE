@@ -3,6 +3,7 @@ const router = express.Router();
 
 const mongoRoutes = require('./mongo');
 const redisRoutes = require('./redis');
+const orientRoutes = require('./orient');
 
 router.get("/", (req, res) => {
     res.json({
@@ -13,5 +14,6 @@ router.get("/", (req, res) => {
 
 router.use("/mongo", mongoRoutes);
 router.use("/redis", redisRoutes);
+router.use("/orient", orientRoutes);
 
 module.exports = router;
