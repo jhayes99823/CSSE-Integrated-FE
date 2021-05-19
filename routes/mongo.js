@@ -2,6 +2,7 @@ const ops = require('../mongo/ops');
 const express = require('express');
 const router = express.Router();
 const constants = require('../common/constants');
+const kafka = require('../kafka/index');
 
 router.get('/review', (req, res) => {
     ops.getAllReviews().then((result) => {
@@ -73,8 +74,21 @@ router.get('/game/:id', (req, res) => {
         });
 });
 
-router.post('/game', (req, res) => {
+router.post('/game', async (req, res) => {
     const { game_title, percent_recommended, game_img_url, num_reviewers } = req.body;
+
+    await kafka.producer.connect();
+
+    await kafka.producer.send({
+        topic: 'testTopic',
+        messages: [
+            { key: 'request-type', value: 'create game' },
+            { key: 'game-title', value: game_title },
+            { key: 'game-percent_recommended', value: percent_recommended },
+            { key: 'game-game_img_url', value: game_img_url },
+            { key: 'game-num_reviewers', value: num_reviewers },
+        ]
+    });
 
     ops.createGame(null, game_title, percent_recommended, num_reviewers, game_img_url)
         .then((result) => {
