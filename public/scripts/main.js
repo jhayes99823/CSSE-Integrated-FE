@@ -6,8 +6,6 @@
  * PUT_YOUR_NAME_HERE
  */
 
-const { response } = require("express");
-
 /** namespace. */
 var rhit = rhit || {};
 
@@ -370,7 +368,7 @@ rhit.MainPageController = class {
 			let recommended = document.querySelector("#gameReviewedRecommend").value;
 			let reviewText = document.querySelector("#gameReviewedText").value
 			const username = rhit.currUserUsername();
-			const data = { username, gameID: game, recommended, review_text: reviewText};
+			const data = { username, gameID: game, recommended, review_text: reviewText };
 
 			fetch(rhit.ORIENT_URL + '/reiviews', {
 				method: "POST",
@@ -709,7 +707,7 @@ rhit.MainPageController = class {
 	}
 
 	_createReviewCard(item) {
-		if(item.recommended){
+		if (item.recommended) {
 			return htmlToElement(`
 				<div id="${item.id}" class="col-md-4 card-with-non-favorite">
 					<div class="card-title">${item.game_title}</div>

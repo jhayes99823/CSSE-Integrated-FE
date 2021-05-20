@@ -1,7 +1,52 @@
 const asyncRedis = require('async-redis');
 const bcrypt = require('bcryptjs')
-const client = asyncRedis.createClient({ port: process.env.REDIS_PORT });
+const kafka = require('../kafka/index');
+const client = asyncRedis.createClient({
+    retry_strategy: function (options) {
+        if (options.error && options.error.code === "ECONNREFUSED") {
+            // End reconnecting on a specific error and flush all commands with
+            // a individual error
+            return new Error("The server refused the connection");
+        }
+        if (options.total_retry_time > 1000 * 60 * 60) {
+            // End reconnecting after a specific timeout and flush all commands
+            // with a individual error
+            return new Error("Retry time exhausted");
+        }
+        if (options.attempt > 10) {
+            // End reconnecting with built in error
+            return undefined;
+        }
+        // reconnect after
+        return Math.min(options.attempt * 100, 3000);
+    },
+});
+
+client.on("ready", async function (err) {
+    await kafka.consumer.connect();
+
+    await kafka.consumer.subscribe({ topic: 'testTopic', fromBeginning: true })
+
+    await kafka.consumer.run({
+        eachMessage: async ({ topic, partition, message }) => {
+            console.log({
+                value: message.value.toString(),
+            });
+
+            if (message.key == 'create user') {
+                const { username, password } = JSON.parse(message.value);
+                createUser(username, password);
+            }
+        },
+    });
+});
+
+client.on("error", function (error) {
+    console.log(error);
+});
+
 const constants = require('../common/constants');
+const { create } = require('../mongo/userReview.model');
 
 const USER_LIKED_BASE = '_LIKED';
 const USER_DISLIKED_BASE = '_DISLIKED';
