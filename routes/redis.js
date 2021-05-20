@@ -1,13 +1,36 @@
 const ops = require('../redis');
 const express = require('express');
 const router = express.Router();
+const kafka = require('../kafka/index');
+const constants = require('../common/constants');
 
-router.post('/user', (req, res) => {
+router.post('/user', async (req, res) => {
     const { username, password } = req.body;
-    ops.createUser(username, password)
-        .then((result) => {
-            res.json({ returnValue: result });
-        });
+
+    ops.ping()
+        .then(async (retVal) => {
+            if (retVal === constants.REDIS_PONG_RESPONSE) {
+                ops.createUser(username, password)
+                    .then((result) => {
+                        res.json({ returnValue: result });
+                    });
+            } else {
+                await kafka.producer.connect();
+
+                const kafkaObj = {
+                    'request-type': 'create user',
+                    'username': username,
+                    'password': password
+                };
+
+                await kafka.producer.send({
+                    topic: 'testTopic',
+                    messages: [
+                        { key: 'new user', value: JSON.stringify(kafkaObj) },
+                    ]
+                });
+            }
+        })
 });
 
 router.delete('/user', (req, res) => {

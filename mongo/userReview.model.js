@@ -2,6 +2,9 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 let UserReview = new Schema({
+    review_id: {
+        type: Number
+    },
     reviewer_id: {
         type: String
     },

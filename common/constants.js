@@ -15,6 +15,8 @@ const NEW_MATCHING_PASSWORD = 'New password cannot match old password';
 const GAME_ADDED = 'Game Successfully Added';
 const GAME_REMOVED = 'Game Successfully Removed';
 
+const REDIS_PONG_RESPONSE = 'PONG';
+
 module.exports = {
     NUM_REVIWERS,
     PERCENT_RECOMMENDED,
@@ -26,5 +28,6 @@ module.exports = {
     GAME_REMOVED,
     GAME_NOT_FOUND,
     GAME_CROSSOVER,
-    NEW_MATCHING_PASSWORD
+    NEW_MATCHING_PASSWORD,
+    REDIS_PONG_RESPONSE
 };

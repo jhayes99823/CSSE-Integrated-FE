@@ -15,6 +15,10 @@ function saltPassword(password) {
     return hash;
 }
 
+async function ping() {
+    return await client.ping();
+}
+
 // create user
 async function createUser(username, password) {
     let user = await client.exists(username);
@@ -255,5 +259,6 @@ module.exports = {
     deleteGameFromLikedList,
     deleteGameFromDislikedList,
     updatePassword,
-    deleteUser
+    deleteUser,
+    ping
 }

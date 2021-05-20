@@ -8,10 +8,6 @@ const kafka = new Kafka({
 const producer = kafka.producer();
 const consumer = kafka.consumer({ groupId: 'test-group' });
 
-async function startProducer() {
-    await producer.connect();
-}
-
 // async function startProducer() {
 //     await producer.connect()
 //     await producer.send({
