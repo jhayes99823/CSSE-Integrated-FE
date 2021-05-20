@@ -9,9 +9,15 @@ async function getAllReviews() {
 }
 
 async function getReviewByID(id) {
-    let review = await Reviews.findById(id);
+    let review = await Reviews.find({ review_id: id });
 
     return review;
+}
+
+async function getTitleWithGameId(id) {
+    let gameTitle = await Games.find({ game_id: id }, { game_title: 1 });
+
+    return gameTitle;
 }
 
 async function getReviewByUser(username) {
@@ -28,12 +34,16 @@ async function addReview(username, gameID, recommended, review_text) {
         console.log("Review already exists");
         return;
     }
+
+    console.log('adding recommended value   ', recommended);
+
     console.log("Review is new");
     let newReview = new Reviews({
         review_id: uuid(),
         reviewer_id: username,
         recommended,
-        review_text
+        review_text,
+        game_id: gameID
     });
 
     let res = await newReview.save();
@@ -77,7 +87,9 @@ async function createGame(game_id, title, perc_rec, n_reviewers, game_img_url, o
 }
 
 async function getGameByID(id) {
-    let game = await Games.findById(id);
+    let game = await Games.find({ game_id: id });
+
+    console.log(game);
 
     return game;
 }
@@ -139,5 +151,6 @@ module.exports = {
     filterGamesByNumReviewers,
     sortGamesByTitle,
     sortGamesByPercentRecommended,
-    sortGamesByNumReviwers
+    sortGamesByNumReviwers,
+    getTitleWithGameId
 }

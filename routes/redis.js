@@ -33,7 +33,7 @@ router.post('/user', async (req, res) => {
             await kafka.producer.send({
                 topic: 'testTopic',
                 messages: [
-                    { key: 'create user', value: JSON.stringify(kafkaObj) },
+                    { key: constants.CREATE_USER, value: JSON.stringify(kafkaObj) },
                 ]
             });
 
@@ -46,25 +46,114 @@ router.post('/user', async (req, res) => {
 router.delete('/user', (req, res) => {
     const { username } = req.body;
 
-    ops.deleteUser(username)
-        .then((result) => {
-            res.json({ returnValue: result });
+    ops.ping()
+        .then(async (retVal) => {
+            if (retVal === constants.REDIS_PONG_RESPONSE) {
+                ops.deleteUser(username)
+                    .then((result) => {
+                        res.json({ returnValue: result });
+                    })
+                    .catch((err) => {
+                        console.log('create user error   ', err);
+                    })
+            }
         })
+        .catch(async (err) => {
+            console.log(err);
+            await kafka.producer.connect();
+
+            const kafkaObj = {
+                'username': username
+            };
+
+            await kafka.producer.send({
+                topic: 'testTopic',
+                messages: [
+                    { key: constants.DELETE_USER, value: JSON.stringify(kafkaObj) },
+                ]
+            });
+
+            res.json({ returnValue: 'REDIS SERVER DOWN' })
+
+            await kafka.producer.disconnect();
+        });
+
 })
 
 router.post('/user/username', (req, res) => {
     const { currUsername, newUsername } = req.body;
-    ops.updateUsername(currUsername, newUsername)
-        .then((result) => {
-            res.json({ returnValue: result });
+
+    ops.ping()
+        .then(async (retVal) => {
+            if (retVal === constants.REDIS_PONG_RESPONSE) {
+                ops.updateUsername(currUsername, newUsername)
+                    .then((result) => {
+                        res.json({ returnValue: result });
+                    })
+                    .catch((err) => {
+                        console.log('create user error   ', err);
+                    })
+            }
+        })
+        .catch(async (err) => {
+            console.log(err);
+            await kafka.producer.connect();
+
+            const kafkaObj = {
+                'currUsername': currUsername,
+                'newUsername': newUsername
+            };
+
+            await kafka.producer.send({
+                topic: 'testTopic',
+                messages: [
+                    { key: constants.UPDATE_USERNAME, value: JSON.stringify(kafkaObj) },
+                ]
+            });
+
+            res.json({ returnValue: 'REDIS SERVER DOWN' })
+
+            await kafka.producer.disconnect();
         });
+
+
 });
 
 router.post('/user/password', (req, res) => {
     const { username, oldpassword, newpassword } = req.body;
-    ops.updatePassword(username, oldpassword, newpassword)
-        .then((result) => {
-            res.json({ returnValue: result });
+
+    ops.ping()
+        .then(async (retVal) => {
+            if (retVal === constants.REDIS_PONG_RESPONSE) {
+                ops.updatePassword(username, oldpassword, newpassword)
+                    .then((result) => {
+                        res.json({ returnValue: result });
+                    })
+                    .catch((err) => {
+                        console.log('create user error   ', err);
+                    })
+            }
+        })
+        .catch(async (err) => {
+            console.log(err);
+            await kafka.producer.connect();
+
+            const kafkaObj = {
+                'username': username,
+                'oldpassword': oldpassword,
+                'newpassword': newpassword
+            };
+
+            await kafka.producer.send({
+                topic: 'testTopic',
+                messages: [
+                    { key: constants.UPDATE_PASSWORD, value: JSON.stringify(kafkaObj) },
+                ]
+            });
+
+            res.json({ returnValue: 'REDIS SERVER DOWN' })
+
+            await kafka.producer.disconnect();
         });
 });
 
@@ -89,24 +178,8 @@ router.post('/login', (req, res) => {
         .catch(async (err) => {
             console.log('trying to login')
             console.log(err);
-            // await kafka.producer.connect();
-
-            // const kafkaObj = {
-            //     'request-type': 'create user',
-            //     'username': username,
-            //     'password': password
-            // };
-
-            // await kafka.producer.send({
-            //     topic: 'testTopic',
-            //     messages: [
-            //         { key: 'new user', value: JSON.stringify(kafkaObj) },
-            //     ]
-            // });
 
             res.json({ returnValue: 'REDIS SERVER DOWN - ATTEMPT LOGIN' })
-
-            // await kafka.producer.disconnect();
         });
 });
 
@@ -122,18 +195,74 @@ router.get('/like', (req, res) => {
 router.post('/like', (req, res) => {
     const { username, gameID } = req.body;
 
-    ops.addGamesToLikedList(username, gameID)
-        .then((result) => {
-            res.json({ returnValue: result });
+    ops.ping()
+        .then(async (retVal) => {
+            if (retVal === constants.REDIS_PONG_RESPONSE) {
+                ops.addGamesToLikedList(username, gameID)
+                    .then((result) => {
+                        res.json({ returnValue: result });
+                    })
+                    .catch((err) => {
+                        console.log('create user error   ', err);
+                    })
+            }
+        })
+        .catch(async (err) => {
+            console.log(err);
+            await kafka.producer.connect();
+
+            const kafkaObj = {
+                'username': username,
+                'gameID': gameID
+            };
+
+            await kafka.producer.send({
+                topic: 'testTopic',
+                messages: [
+                    { key: constants.ADD_LIKED_GAME, value: JSON.stringify(kafkaObj) },
+                ]
+            });
+
+            res.json({ returnValue: 'REDIS SERVER DOWN' })
+
+            await kafka.producer.disconnect();
         });
 });
 
 router.delete('/like', (req, res) => {
     const { username, gameID } = req.body;
 
-    ops.deleteGameFromLikedList(username, gameID)
-        .then((result) => {
-            res.json({ returnValue: result });
+    ops.ping()
+        .then(async (retVal) => {
+            if (retVal === constants.REDIS_PONG_RESPONSE) {
+                ops.deleteGameFromLikedList(username, gameID)
+                    .then((result) => {
+                        res.json({ returnValue: result });
+                    })
+                    .catch((err) => {
+                        console.log('create user error   ', err);
+                    })
+            }
+        })
+        .catch(async (err) => {
+            console.log(err);
+            await kafka.producer.connect();
+
+            const kafkaObj = {
+                'username': username,
+                'gameID': gameID
+            };
+
+            await kafka.producer.send({
+                topic: 'testTopic',
+                messages: [
+                    { key: constants.REMOVE_LIKED_GAME, value: JSON.stringify(kafkaObj) },
+                ]
+            });
+
+            res.json({ returnValue: 'REDIS SERVER DOWN' })
+
+            await kafka.producer.disconnect();
         });
 });
 
@@ -149,20 +278,74 @@ router.get('/dislike', (req, res) => {
 router.post('/dislike', (req, res) => {
     const { username, gameID } = req.body;
 
-    ops.addGameToDislikedList(username, gameID)
-        .then((result) => {
-            res.json({ returnValue: result });
+    ops.ping()
+        .then(async (retVal) => {
+            if (retVal === constants.REDIS_PONG_RESPONSE) {
+                ops.addGameToDislikedList(username, gameID)
+                    .then((result) => {
+                        res.json({ returnValue: result });
+                    })
+                    .catch((err) => {
+                        console.log('create user error   ', err);
+                    })
+            }
+        })
+        .catch(async (err) => {
+            console.log(err);
+            await kafka.producer.connect();
+
+            const kafkaObj = {
+                'username': username,
+                'gameID': gameID
+            };
+
+            await kafka.producer.send({
+                topic: 'testTopic',
+                messages: [
+                    { key: constants.ADD_DISLIKED_GAME, value: JSON.stringify(kafkaObj) },
+                ]
+            });
+
+            res.json({ returnValue: 'REDIS SERVER DOWN' })
+
+            await kafka.producer.disconnect();
         });
 });
 
 router.delete('/dislike', (req, res) => {
     const { username, gameID } = req.body;
 
-    console.log('username ', username, '   gameID  ', gameID);
+    ops.ping()
+        .then(async (retVal) => {
+            if (retVal === constants.REDIS_PONG_RESPONSE) {
+                ops.deleteGameFromDislikedList(username, gameID)
+                    .then((result) => {
+                        res.json({ returnValue: result });
+                    })
+                    .catch((err) => {
+                        console.log('create user error   ', err);
+                    })
+            }
+        })
+        .catch(async (err) => {
+            console.log(err);
+            await kafka.producer.connect();
 
-    ops.deleteGameFromDislikedList(username, gameID)
-        .then((result) => {
-            res.json({ returnValue: result });
+            const kafkaObj = {
+                'username': username,
+                'gameID': gameID
+            };
+
+            await kafka.producer.send({
+                topic: 'testTopic',
+                messages: [
+                    { key: constants.REMOVE_DISLIKED_GAME, value: JSON.stringify(kafkaObj) },
+                ]
+            });
+
+            res.json({ returnValue: 'REDIS SERVER DOWN' })
+
+            await kafka.producer.disconnect();
         });
 });
 

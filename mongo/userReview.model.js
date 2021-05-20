@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 let UserReview = new Schema({
     review_id: {
-        type: Number
+        type: String
     },
     reviewer_id: {
         type: String

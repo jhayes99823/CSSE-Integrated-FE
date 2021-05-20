@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 let Game = new Schema({
     game_id: {
-        type: Number
+        type: String
     },
     game_title: {
         type: String

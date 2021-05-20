@@ -14,7 +14,7 @@ router.get('/review/:id', (req, res) => {
 
     ops.getReviewByID(id)
         .then((result) => {
-            res.json({ returnValue: result });
+            res.json({ returnValue: result[0] });
         });
 });
 
@@ -29,7 +29,7 @@ router.get('/reviews', (req, res) => {
 
 router.post('/reviews', (req, res) => {
     const { username, gameID, recommended, review_text } = req.body;
-    
+
     ops.addReview(username, gameID, recommended, review_text)
         .then((result) => {
             res.json({ returnValue: result });
@@ -105,7 +105,16 @@ router.get('/game/:id', (req, res) => {
 
     ops.getGameByID(id)
         .then((result) => {
-            res.json({ returnValue: result });
+            res.json({ returnValue: result[0] });
+        });
+});
+
+router.get('/game/title/:title', (req, res) => {
+    const { title } = req.params;
+
+    ops.getTitleWithGameId(id)
+        .then((result) => {
+            res.json({ returnValue: result[0] });
         });
 });
 
@@ -115,7 +124,9 @@ router.post('/game', async (req, res) => {
     ops.createGame(game_id, game_title, percent_recommended, num_reviewers, game_img_url)
         .then((result) => {
             res.json({ returnValue: result });
-        });
+        }).catch((err) => {
+            console.log(err);
+        })
 });
 
 module.exports = router;

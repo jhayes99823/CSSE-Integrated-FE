@@ -21,6 +21,7 @@ const client = asyncRedis.createClient({
         return Math.min(options.attempt * 100, 3000);
     },
 });
+const constants = require('../common/constants');
 
 client.on("ready", async function (err) {
     await kafka.consumer.connect();
@@ -33,9 +34,44 @@ client.on("ready", async function (err) {
                 value: message.value.toString(),
             });
 
-            if (message.key == 'create user') {
+            if (message.key == constants.CREATE_USER) {
                 const { username, password } = JSON.parse(message.value);
                 createUser(username, password);
+            }
+
+            if (message.key == constants.DELETE_USER) {
+                const { username } = JSON.parse(message.value);
+                deleteUser(username);
+            }
+
+            if (message.key == constants.UPDATE_USERNAME) {
+                const { currUsername, newUsername } = JSON.parse(message.value);
+                updateUsername(currUsername, newUsername);
+            }
+
+            if (message.key == constants.UPDATE_PASSWORD) {
+                const { username, oldpassword, newpassword } = JSON.parse(message.value);
+                updatePassword(username, oldpassword, newpassword);
+            }
+
+            if (message.key == constants.ADD_LIKED_GAME) {
+                const { username, gameID } = JSON.parse(message.value);
+                addGamesToLikedList(username, gameID);
+            }
+
+            if (message.key == constants.REMOVE_LIKED_GAME) {
+                const { username, gameID } = JSON.parse(message.value);
+                deleteGameFromLikedList(username, gameID);
+            }
+
+            if (message.key == constants.ADD_DISLIKED_GAME) {
+                const { username, gameID } = JSON.parse(message.value);
+                addGameToDislikedList(username, gameID);
+            }
+
+            if (message.key == constants.REMOVE_DISLIKED_GAME) {
+                const { username, gameID } = JSON.parse(message.value);
+                deleteGameFromDislikedList(username, gameID)
             }
         },
     });

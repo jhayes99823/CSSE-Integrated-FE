@@ -135,7 +135,7 @@ rhit.MainPageController = class {
 				.then((data) => {
 					$.each(data.returnValue, function (i, item) {
 						$('#gameOptList').append($('<option>', {
-							value: item._id,
+							value: item.game_id,
 							text: item.game_title
 						}));
 					});
@@ -155,7 +155,7 @@ rhit.MainPageController = class {
 					for (let val of data.returnValue) {
 						rhit.GetGameInfo(val).then(retData => {
 							$('#dislikedOptList').append($('<option>', {
-								value: retData._id,
+								value: retData.game_id,
 								text: retData.game_title
 							}));
 						});
@@ -208,7 +208,7 @@ rhit.MainPageController = class {
 				.then((data) => {
 					$.each(data.returnValue, function (i, item) {
 						$('#gameOptListLiked').append($('<option>', {
-							value: item._id,
+							value: item.game_id,
 							text: item.game_title
 						}));
 					});
@@ -227,7 +227,7 @@ rhit.MainPageController = class {
 					for (let val of data.returnValue) {
 						rhit.GetGameInfo(val).then(retData => {
 							$('#likedOptList').append($('<option>', {
-								value: retData._id,
+								value: retData.game_id,
 								text: retData.game_title
 							}));
 						});
@@ -311,7 +311,7 @@ rhit.MainPageController = class {
 				.then((data) => {
 					$.each(data.returnValue, function (i, item) {
 						$('#gameOptListReviewed').append($('<option>', {
-							value: item._id,
+							value: item.game_id,
 							text: item.game_title
 						}));
 					});
@@ -330,7 +330,7 @@ rhit.MainPageController = class {
 					for (let val of data.returnValue) {
 						rhit.GetReviewInfo(val).then(retData => {
 							$('#reviewedOptList').append($('<option>', {
-								value: retData._id,
+								value: retData.game_id,
 								text: retData.game_title
 							}));
 						});
@@ -365,10 +365,16 @@ rhit.MainPageController = class {
 
 		document.querySelector("#submitReviewedGame").addEventListener("click", (event) => {
 			let game = document.querySelector("#gameOptListReviewed").value;
-			let recommended = document.querySelector("#gameReviewedRecommend").value;
-			let reviewText = document.querySelector("#gameReviewedText").value
+			// let recommended = document.querySelector("#gameReviewedRecommend").value;
+			let recommended = $("#gameReviewedRecommend").is(":checked") ? "true" : "false";
+
+			console.log('rec from front end   ', recommended);
+			let reviewText = document.querySelector("#gameReviewedText").value;
+			console.log('review text  ', reviewText);
 			const username = rhit.currUserUsername();
 			const data = { username, gameID: game, recommended, review_text: reviewText };
+
+			console.log('data being sent to create review   ', data);
 
 			fetch(rhit.ORIENT_URL + '/reviews', {
 				method: "POST",
@@ -507,7 +513,7 @@ rhit.MainPageController = class {
 					const newList = htmlToElement('<div id="itemRow-all" class="row"> </div>');
 
 					for (let val of data.returnValue) {
-						rhit.GetGameInfo(val._id).then(retData => {
+						rhit.GetGameInfo(val.game_id).then(retData => {
 							const newCard = this._createCard(retData);
 
 							newList.appendChild(newCard);
@@ -535,7 +541,7 @@ rhit.MainPageController = class {
 					const newList = htmlToElement('<div id="itemRow-all" class="row"> </div>');
 
 					for (let val of data.returnValue) {
-						rhit.GetGameInfo(val._id).then(retData => {
+						rhit.GetGameInfo(val.game_id).then(retData => {
 							const newCard = this._createCard(retData);
 
 							newList.appendChild(newCard);
@@ -561,7 +567,7 @@ rhit.MainPageController = class {
 					const newList = htmlToElement('<div id="itemRow-all" class="row"> </div>');
 
 					for (let val of data.returnValue) {
-						rhit.GetGameInfo(val._id).then(retData => {
+						rhit.GetGameInfo(val.game_id).then(retData => {
 							const newCard = this._createCard(retData);
 
 							newList.appendChild(newCard);
@@ -592,8 +598,8 @@ rhit.MainPageController = class {
 				console.log('data   ', data);
 				console.log('data.resultValue   ', data.returnValue);
 				for (let val of data.returnValue) {
-					console.log('ALL GAMES:   ', val._id);
-					rhit.GetGameInfo(val._id).then(retData => {
+					console.log('ALL GAMES:   ', val.game_id);
+					rhit.GetGameInfo(val.game_id).then(retData => {
 						const newCard = this._createCard(retData);
 
 						newList.appendChild(newCard);
@@ -645,6 +651,7 @@ rhit.MainPageController = class {
 				console.log('data   ', data);
 				console.log('data.resultValue   ', data.returnValue);
 				for (let val of data.returnValue) {
+					console.log('disliked games   val  ', data.returnValue);
 					rhit.GetGameInfo(val).then(retData => {
 						const newCard = this._createCard(retData);
 
@@ -663,7 +670,7 @@ rhit.MainPageController = class {
 	}
 
 	getReviewedList() {
-		const newList = htmlToElement('<div id="itemRow-dislike" class="row"> </div>');
+		const newList = htmlToElement('<div id="itemRow-review" class="row"> </div>');
 
 		fetch(rhit.MONGO_URL + '/reviews?username=' + rhit.currUserUsername())
 			.then(response => response.json())
@@ -671,6 +678,7 @@ rhit.MainPageController = class {
 				console.log('data   ', data);
 				console.log('data.resultValue   ', data.returnValue);
 				for (let val of data.returnValue) {
+					console.log('getting review list data   ', val);
 					rhit.GetReviewInfo(val).then(retData => {
 						const newCard = this._createReviewCard(retData);
 
@@ -680,7 +688,7 @@ rhit.MainPageController = class {
 			});
 
 		// remove old quoteListContainer
-		const oldList = document.querySelector("#itemRow-dislike");
+		const oldList = document.querySelector("#itemRow-review");
 		oldList.removeAttribute("id");
 		oldList.hidden = true;
 
@@ -691,8 +699,8 @@ rhit.MainPageController = class {
 	_createCard(item) {
 		console.log('item info  ', item);
 		return htmlToElement(`
-		<div id="${item.id}" class="col-md-4 card-with-non-favorite">
-              <div class="card mb-4 box-shadow" data-item-id="${item.id}">
+		<div id="${item.game_id}" class="col-md-4 card-with-non-favorite">
+              <div class="card mb-4 box-shadow" data-item-id="${item.game_id}">
 			  <img class="card-img-top"
 			  data-src="holder.js/100px225?theme=thumb&amp;bg=55595c&amp;fg=eceeef&amp;text=Thumbnail"
 			  alt="Thumbnail [100%x225]" style="height: 225px; width: 100%; display: block"
@@ -707,23 +715,28 @@ rhit.MainPageController = class {
 	}
 
 	_createReviewCard(item) {
+		console.log('creating review card   ', item);
 		if (item.recommended) {
 			return htmlToElement(`
 				<div id="${item.id}" class="col-md-4 card-with-non-favorite">
+				<div class="card mb-4 box-shadow" data-item-id="${item.game_id}">
 					<div class="card-title">${item.game_title}</div>
 					<div class="card-text">
 						<p>Recommended</p>
 						<p>${item.review_text}</p>
+					</div>
 					</div>
 				</div>
 			`);
 		} else {
 			return htmlToElement(`
 			<div id="${item.id}" class="col-md-4 card-with-non-favorite">
+				<div class="card mb-4 box-shadow" data-item-id="${item.game_id}">
 				<div class="card-title">${item.game_title}</div>
 				<div class="card-text">
 					<p>Not Recommended</p>
 					<p>${item.review_text}</p>
+				</div>
 				</div>
 			</div>
 		`);
@@ -746,9 +759,19 @@ rhit.GetGameInfo = async function (id) {
 }
 
 rhit.GetReviewInfo = async function (id) {
-	const review = await fetch(rhit.MONGO_URL + '/review/' + id).then(response => response.json());
+	console.log('getting review info id   ', id);
+	const review = await fetch(rhit.MONGO_URL + '/review/' + id.review_id).then(response => response.json());
+
+	console.log(`review.returnValue.game_id`, review.returnValue);
+	const gameTitle = rhit.GetTitleInfo(review.returnValue.game_title)
 
 	return review.returnValue;
+}
+
+rhit.GetTitleInfo = async function (gameId) {
+	const gameTitle = await fetch(rhit.MONGO_URL + '/game/title/' + gameId).then(response => response.json());
+
+	console.log('gameTitle   ', gameTitle);
 }
 
 rhit.currUserUsername = function () {
