@@ -349,7 +349,7 @@ rhit.MainPageController = class {
 			let username = rhit.currUserUsername();
 			let data = { username, gameID: game };
 
-			fetch(rhit.ORIENT_URL + '/reiviews', {
+			fetch(rhit.ORIENT_URL + '/reviews', {
 				method: "DELETE",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify(data)
@@ -372,7 +372,7 @@ rhit.MainPageController = class {
 			const username = rhit.currUserUsername();
 			const data = { username, gameID: game, recommended, review_text: reviewText};
 
-			fetch(rhit.ORIENT_URL + '/reiviews', {
+			fetch(rhit.ORIENT_URL + '/reviews', {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify(data)
