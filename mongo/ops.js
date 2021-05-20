@@ -21,12 +21,14 @@ async function getReviewByUser(username) {
 }
 
 async function addReview(username, gameID, recommended, review_text) {
+    console.log("Adding a review " + username + " " + gameID);
     let review = await Reviews.find({ reviewer_id: username, game_id: gameID });
 
     if (review.length > 0) {
+        console.log("Review already exists");
         return;
     }
-
+    console.log("Review is new");
     let newReview = new Reviews({
         review_id: uuid(),
         reviewer_id: username,
@@ -35,13 +37,14 @@ async function addReview(username, gameID, recommended, review_text) {
     });
 
     let res = await newReview.save();
-
+    console.log(res);
     return res;
 }
 
 async function deleteReview(username, gameID) {
+    console.log("Delete review " + username + " " + gameID)
     let res = await Reviews.deleteOne({ reviewer_id: username, game_id: gameID });
-
+    console.log(res)
     return res;
 }
 
