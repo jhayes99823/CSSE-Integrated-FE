@@ -1,10 +1,48 @@
 let Reviews = require('./userReview.model');
 let Games = require('./game.model');
+let uuid = require('uuid');
 
 async function getAllReviews() {
     let reviews = await Reviews.find({});
 
     return reviews;
+}
+
+async function getReviewByID(id) {
+    let review = await Reviews.findById(id);
+
+    return review;
+}
+
+async function getReviewByUser(username) {
+    let reviews = await Reviews.find({ reviewer_id: username });
+
+    return reviews;
+}
+
+async function addReview(username, gameID, recommended, review_text) {
+    let review = await Reviews.find({ reviewer_id: username, game_id: gameID });
+
+    if (review.length > 0) {
+        return;
+    }
+
+    let newReview = new Reviews({
+        review_id: uuid(),
+        reviewer_id: username,
+        recommended,
+        review_text
+    });
+
+    let res = await newReview.save();
+
+    return res;
+}
+
+async function deleteReview(username, gameID) {
+    let res = await Reviews.deleteOne({ reviewer_id: username, game_id: gameID });
+
+    return res;
 }
 
 async function getAllGames() {
@@ -86,6 +124,10 @@ async function sortGamesByNumReviwers(order) {
 
 module.exports = {
     getAllReviews,
+    getReviewByID,
+    getReviewByUser,
+    addReview,
+    deleteReview,
     getAllGames,
     createGame,
     getGamesByTitle,

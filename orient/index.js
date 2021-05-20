@@ -44,4 +44,72 @@ function _recommendGames(userId) {
     });
 }
 
+async function addReview(username, gameID) {
+    if(!(await _userExists(username))) {
+        await _addUser(username);
+    }
+    if(!(await _gameExists(gameID))) {
+        await _addGame(gameID);
+    }
+    return await _addReview(username, gameID);
+}
+
+function _userExists(username) {
+    return db.query(
+        'SELECT FROM User WHERE name = :username',
+        {params: {username}}
+    ).then((res) => {
+        return res.length != 0;
+    });
+}
+
+function _addUser(username) {
+    return db.query(
+        'CREATE VERTEX User SET name = :username',
+        {params: {username}}
+    ).then((res) => {});
+}
+
+function _gameExists(gameID) {
+    return db.query(
+        'SELECT FROM Game WHERE name = :gameID',
+        {params: {gameID}}
+    ).then((res) => {
+        return res.length != 0;
+    });
+}
+
+function _addGame(gameID) {
+    return db.query(
+        'CREATE VERTEX Game SET name = :gameID',
+        {params: {gameID}}
+    ).then((res) => {});
+}
+
+function _addReview(username, gameID, recommend) {
+    if(recommend) {
+        return db.query(
+            'CREATE EDGE recommends FROM (SELECT FROM User WHERE name = :username) TO (SELECT FROM Game WHERE name = :gameID)',
+            {params: {username, gameID}}
+        ).then((res) => {return true});
+    } else {
+        return db.query(
+            'CREATE EDGE does-not_recommend FROM (SELECT FROM User WHERE name = :username) TO (SELECT FROM Game WHERE name = :gameID)',
+            {params: {username, gameID}}
+        ).then((res) => {return true});
+    }
+    
+}
+
+async function deleteReview(username, gameID) {
+    return await _deleteReview(username, gameID);
+}
+
+function _deleteReview(username, gameID) {
+    return db.query(
+        'DELETE EDGE FROM (SELECT FROM User WHERE name = :username) TO (SELECT FROM Game WHERE name = :gameID)',
+        {params: {username, gameID}}
+    ).then((res) => {return true});
+}
+
 module.exports = { recommendGames }

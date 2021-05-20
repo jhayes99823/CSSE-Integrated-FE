@@ -9,6 +9,42 @@ router.get('/review', (req, res) => {
     })
 });
 
+router.get('/review/:id', (req, res) => {
+    const { id } = req.params;
+
+    ops.getReviewByID(id)
+        .then((result) => {
+            res.json({ returnValue: result });
+        });
+});
+
+router.get('/reviews', (req, res) => {
+    const { username } = req.query;
+
+    ops.getReviewByUser(username)
+        .then((result) => {
+            res.json({ returnValue: result });
+        });
+});
+
+router.post('/reviews', (req, res) => {
+    const { username, gameID, recommended, review_text } = req.body;
+
+    ops.addReview(username, gameID, recommended, review_text)
+        .then((result) => {
+            res.json({ returnValue: result });
+        });
+});
+
+router.delete('/reviews', (req, res) => {
+    const { username, gameID } = req.body;
+
+    ops.deleteReview(username, gameID)
+        .then((result) => {
+            res.json({ returnValue: result });
+        });
+});
+
 router.get('/game', (req, res) => {
     const { title } = req.query;
 

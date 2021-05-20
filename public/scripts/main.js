@@ -6,6 +6,8 @@
  * PUT_YOUR_NAME_HERE
  */
 
+const { response } = require("express");
+
 /** namespace. */
 var rhit = rhit || {};
 
@@ -14,6 +16,7 @@ rhit.variableName = "";
 rhit.BASE_URL = "http://433-21.csse.rose-hulman.edu:3100/api";
 rhit.MONGO_URL = rhit.BASE_URL + '/mongo';
 rhit.REDIS_URL = rhit.BASE_URL + '/redis';
+rhit.ORIENT_URL = rhit.BASE_URL + '/orient';
 
 rhit.CURR_USER_KEY = 'currUser';
 
@@ -119,6 +122,7 @@ rhit.MainPageController = class {
 		this.getAllGames();
 		this.getLikedList()
 		this.getDislikedList();
+		this.getReviewedList();
 
 		document.querySelector('#logout-btn').addEventListener("click", (event) => {
 			localStorage.removeItem(rhit.CURR_USER_KEY);
@@ -298,6 +302,93 @@ rhit.MainPageController = class {
 					if (data) location.reload();
 				});
 		});
+
+
+
+		$("#addReviewModal").on("show.bs.modal", (event) => {
+			console.log('made it here   review');
+			// pre animation
+			fetch(rhit.MONGO_URL + '/game')
+				.then(response => response.json())
+				.then((data) => {
+					$.each(data.returnValue, function (i, item) {
+						$('#gameOptListReviewed').append($('<option>', {
+							value: item._id,
+							text: item.game_title
+						}));
+					});
+				});
+		});
+
+		$("#addReviewModal").on("hide.bs.modal", (event) => {
+			$('#gameOptListReviewed').empty()
+		});
+
+		$("#deleteReviewModal").on("show.bs.modal", (event) => {
+			// pre animation
+			fetch(rhit.MONGO_URL + '/reviews?username=' + rhit.currUserUsername())
+				.then(response => response.json())
+				.then((data) => {
+					for (let val of data.returnValue) {
+						rhit.GetReviewInfo(val).then(retData => {
+							$('#reviewedOptList').append($('<option>', {
+								value: retData._id,
+								text: retData.game_title
+							}));
+						});
+					}
+				});
+		});
+
+		$("#deleteReviewModal").on("hide.bs.modal", (event) => {
+			$('#reviewedOptList').empty()
+		});
+
+		document.querySelector("#deleteReviewedGame").addEventListener("click", (event) => {
+			let game = document.querySelector("#reviewedOptList").value;
+			let username = rhit.currUserUsername();
+			let data = { username, gameID: game };
+
+			fetch(rhit.ORIENT_URL + '/reiviews', {
+				method: "DELETE",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(data)
+			}).then((orientRes) => {
+				fetch(rhit.MONGO_URL + '/reviews', {
+					method: "DELETE",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify(data)
+				}).then(response => response.json())
+					.then((data) => {
+						if (data) location.reload();
+					});
+			});
+		});
+
+		document.querySelector("#submitReviewedGame").addEventListener("click", (event) => {
+			let game = document.querySelector("#gameOptListReviewed").value;
+			let recommended = document.querySelector("#gameReviewedRecommend").value;
+			let reviewText = document.querySelector("#gameReviewedText").value
+			const username = rhit.currUserUsername();
+			const data = { username, gameID: game, recommended, review_text: reviewText};
+
+			fetch(rhit.ORIENT_URL + '/reiviews', {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(data)
+			}).then((orientRes) => {
+				fetch(rhit.MONGO_URL + '/reviews', {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify(data)
+				}).then(response => response.json())
+					.then((data) => {
+						if (data) location.reload();
+					});
+			});
+		});
+
+
 
 		document.querySelector('#submitUpdateUsername').addEventListener('click', (event) => {
 			let currUsername = document.querySelector("#oldUsername").value;
@@ -573,6 +664,32 @@ rhit.MainPageController = class {
 		oldList.parentElement.appendChild(newList);
 	}
 
+	getReviewedList() {
+		const newList = htmlToElement('<div id="itemRow-dislike" class="row"> </div>');
+
+		fetch(rhit.MONGO_URL + '/reviews?username=' + rhit.currUserUsername())
+			.then(response => response.json())
+			.then((data) => {
+				console.log('data   ', data);
+				console.log('data.resultValue   ', data.returnValue);
+				for (let val of data.returnValue) {
+					rhit.GetReviewInfo(val).then(retData => {
+						const newCard = this._createReviewCard(retData);
+
+						newList.appendChild(newCard);
+					});
+				}
+			});
+
+		// remove old quoteListContainer
+		const oldList = document.querySelector("#itemRow-dislike");
+		oldList.removeAttribute("id");
+		oldList.hidden = true;
+
+		// put in new quoteListContainer
+		oldList.parentElement.appendChild(newList);
+	}
+
 	_createCard(item) {
 		console.log('item info  ', item);
 		return htmlToElement(`
@@ -590,6 +707,30 @@ rhit.MainPageController = class {
 			</div>
 		`);
 	}
+
+	_createReviewCard(item) {
+		if(item.recommended){
+			return htmlToElement(`
+				<div id="${item.id}" class="col-md-4 card-with-non-favorite">
+					<div class="card-title">${item.game_title}</div>
+					<div class="card-text">
+						<p>Recommended</p>
+						<p>${item.review_text}</p>
+					</div>
+				</div>
+			`);
+		} else {
+			return htmlToElement(`
+			<div id="${item.id}" class="col-md-4 card-with-non-favorite">
+				<div class="card-title">${item.game_title}</div>
+				<div class="card-text">
+					<p>Not Recommended</p>
+					<p>${item.review_text}</p>
+				</div>
+			</div>
+		`);
+		}
+	}
 }
 
 // From: https://stackoverflow.com/questions/494143/creating-a-new-dom-element-from-an-html-string-using-built-in-dom-methods-or-pro/35385518#35385518
@@ -604,6 +745,12 @@ rhit.GetGameInfo = async function (id) {
 	const game = await fetch(rhit.MONGO_URL + '/game/' + id).then(response => response.json());
 
 	return game.returnValue;
+}
+
+rhit.GetReviewInfo = async function (id) {
+	const review = await fetch(rhit.MONGO_URL + '/review/' + id).then(response => response.json());
+
+	return review.returnValue;
 }
 
 rhit.currUserUsername = function () {
