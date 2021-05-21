@@ -1,10 +1,35 @@
 var ODatabase = require('orientjs').ODatabase;
+const constants = require('../common/constants');
+const fs = require('fs');
+
 var db = new ODatabase({
     host: '433-21.csse.rose-hulman.edu',
     port: 2424,
     username: 'root',
     password: 'pheeN7wi',
     name: '433project'
+});
+
+db.on("endQuery", function (obj) {
+    console.log("DEBUG QUERY:", obj);
+
+    if (obj.err != undefined) {
+        if (obj.err != undefined) {
+            var data = fs.readFileSync(constants.DATABASE_STATUS_FILE_LOCATION, (err, data) => { });
+            var dataParsed = JSON.parse(data);
+            dataParsed.orient = false;
+
+            console.log('about to write to file orient=false');
+
+            try {
+                console.log('trying to write to file orient=false');
+                fs.writeFileSync('./database_status.json', JSON.stringify(dataParsed));
+                console.log('Successfully wrote file')
+            } catch (err) {
+                console.log('Error writing file', err)
+            }
+        }
+    }
 });
 
 async function recommendGames(userId) {

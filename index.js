@@ -1,5 +1,15 @@
 const dotenv = require('dotenv');
 dotenv.config();
+const constants = require('./common/constants');
+const fs = require('fs')
+
+try {
+    fs.writeFileSync('./database_status.json', constants.DATABASE_STATUS_DEFAULT);
+    console.log('Successfully wrote file')
+} catch (err) {
+    console.log('Error writing file', err)
+}
+
 
 const express = require('express');
 const bodyParser = require('body-parser');

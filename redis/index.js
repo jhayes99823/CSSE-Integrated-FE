@@ -81,9 +81,6 @@ client.on("error", function (error) {
     console.log(error);
 });
 
-const constants = require('../common/constants');
-const { create } = require('../mongo/userReview.model');
-
 const USER_LIKED_BASE = '_LIKED';
 const USER_DISLIKED_BASE = '_DISLIKED';
 const USERNAME_KEY = 'username';

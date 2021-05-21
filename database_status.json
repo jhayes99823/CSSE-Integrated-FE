@@ -1,1 +1,1 @@
-{"redis":true,"orient":true,"mongo":true}
+{"redis":true,"orient":false,"mongo":true}
