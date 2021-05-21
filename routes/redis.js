@@ -54,7 +54,7 @@ router.delete('/user', (req, res) => {
                         res.json({ returnValue: result });
                     })
                     .catch((err) => {
-                        console.log('create user error   ', err);
+                        console.log('delete user error   ', err);
                     })
             }
         })
@@ -91,7 +91,7 @@ router.post('/user/username', (req, res) => {
                         res.json({ returnValue: result });
                     })
                     .catch((err) => {
-                        console.log('create user error   ', err);
+                        console.log('update user username error   ', err);
                     })
             }
         })
@@ -130,7 +130,7 @@ router.post('/user/password', (req, res) => {
                         res.json({ returnValue: result });
                     })
                     .catch((err) => {
-                        console.log('create user error   ', err);
+                        console.log('update user password error   ', err);
                     })
             }
         })
@@ -172,7 +172,6 @@ router.post('/login', (req, res) => {
 
     ops.login(username, password)
         .then((result) => {
-            console.log('getting redis server results  ', result);
             res.send({ returnValue: result });
         })
         .catch(async (err) => {
@@ -186,9 +185,22 @@ router.post('/login', (req, res) => {
 router.get('/like', (req, res) => {
     const { username } = req.query;
 
-    ops.getLikedGamesByUserId(username)
-        .then((result) => {
-            res.json({ returnValue: result });
+    ops.ping()
+        .then(async (retVal) => {
+            if (retVal === constants.REDIS_PONG_RESPONSE) {
+                ops.getLikedGamesByUserId(username)
+                    .then((result) => {
+                        res.json({ returnValue: result });
+                    })
+                    .catch((err) => {
+                        console.log('get liked games error   ', err);
+                    })
+            }
+        })
+        .catch(async (err) => {
+            console.log(err);
+
+            res.json({ returnValue: 'REDIS SERVER DOWN' })
         });
 });
 
@@ -203,7 +215,7 @@ router.post('/like', (req, res) => {
                         res.json({ returnValue: result });
                     })
                     .catch((err) => {
-                        console.log('create user error   ', err);
+                        console.log('add liked game error   ', err);
                     })
             }
         })
@@ -240,7 +252,7 @@ router.delete('/like', (req, res) => {
                         res.json({ returnValue: result });
                     })
                     .catch((err) => {
-                        console.log('create user error   ', err);
+                        console.log('delete liked game error   ', err);
                     })
             }
         })
@@ -269,9 +281,22 @@ router.delete('/like', (req, res) => {
 router.get('/dislike', (req, res) => {
     const { username } = req.query;
 
-    ops.getDislikedGamesByUserId(username)
-        .then((result) => {
-            res.json({ returnValue: result });
+    ops.ping()
+        .then(async (retVal) => {
+            if (retVal === constants.REDIS_PONG_RESPONSE) {
+                ops.getDislikedGamesByUserId(username)
+                    .then((result) => {
+                        res.json({ returnValue: result });
+                    })
+                    .catch((err) => {
+                        console.log('get disliked error   ', err);
+                    })
+            }
+        })
+        .catch(async (err) => {
+            console.log(err);
+
+            res.json({ returnValue: 'REDIS SERVER DOWN' })
         });
 });
 
@@ -286,7 +311,7 @@ router.post('/dislike', (req, res) => {
                         res.json({ returnValue: result });
                     })
                     .catch((err) => {
-                        console.log('create user error   ', err);
+                        console.log('add disliked game error   ', err);
                     })
             }
         })
@@ -323,7 +348,7 @@ router.delete('/dislike', (req, res) => {
                         res.json({ returnValue: result });
                     })
                     .catch((err) => {
-                        console.log('create user error   ', err);
+                        console.log('delete disliked game error   ', err);
                     })
             }
         })

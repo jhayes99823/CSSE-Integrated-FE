@@ -1,6 +1,21 @@
 let Reviews = require('./userReview.model');
 let Games = require('./game.model');
 let uuid = require('uuid');
+const kafka = require('../kafka/index');
+const constants = require('../common/constants');
+const db = require('mongoose').connection;
+
+db.on('reconnected', async function () {
+    await kafka.consumer.connect();
+
+    await kafka.consumer.run({
+        eachMessage: async ({ topic, partition, message }) => {
+            console.log({
+                value: message.value.toString(),
+            });
+        }
+    });
+});
 
 async function getAllReviews() {
     let reviews = await Reviews.find({});

@@ -7,6 +7,9 @@ router.get('/review', (req, res) => {
     ops.getAllReviews().then((result) => {
         res.json({ returnValue: result });
     })
+        .catch((err) => {
+            console.log('get review error   ', err);
+        })
 });
 
 router.get('/review/:id', (req, res) => {
@@ -15,7 +18,9 @@ router.get('/review/:id', (req, res) => {
     ops.getReviewByID(id)
         .then((result) => {
             res.json({ returnValue: result[0] });
-        });
+        }).catch((err) => {
+            console.log('get review by id error   ', err);
+        })
 });
 
 router.get('/reviews', (req, res) => {
@@ -24,7 +29,9 @@ router.get('/reviews', (req, res) => {
     ops.getReviewByUser(username)
         .then((result) => {
             res.json({ returnValue: result });
-        });
+        }).catch((err) => {
+            console.log('get review by user error   ', err);
+        })
 });
 
 router.post('/reviews', (req, res) => {
@@ -33,7 +40,10 @@ router.post('/reviews', (req, res) => {
     ops.addReview(username, gameID, recommended, review_text)
         .then((result) => {
             res.json({ returnValue: result });
-        });
+        })
+        .catch((err) => {
+            console.log('create new review error   ', err);
+        })
 });
 
 router.delete('/reviews', (req, res) => {
@@ -42,7 +52,9 @@ router.delete('/reviews', (req, res) => {
     ops.deleteReview(username, gameID)
         .then((result) => {
             res.json({ returnValue: result });
-        });
+        }).catch((err) => {
+            console.log('delete review error   ', err);
+        })
 });
 
 router.get('/game', (req, res) => {
@@ -52,11 +64,16 @@ router.get('/game', (req, res) => {
         ops.getGamesByTitle(title)
             .then((result) => {
                 res.json({ returnValue: result });
-            });
+            }).catch((err) => {
+                console.log('get game by title error   ', err);
+            })
     } else {
         ops.getAllGames().then((result) => {
             res.json({ returnValue: result });
-        });
+        })
+            .catch((err) => {
+                console.log('get all games error   ', err);
+            })
     }
 });
 
@@ -67,19 +84,28 @@ router.get('/game/sort', (req, res) => {
         ops.sortGamesByTitle(parseInt(order))
             .then((result) => {
                 res.json({ returnValue: result });
-            });
+            })
+            .catch((err) => {
+                console.log('sort game by title error   ', err);
+            })
     }
     if (field == constants.PERCENT_RECOMMENDED) {
         ops.sortGamesByPercentRecommended(parseInt(order))
             .then((result) => {
                 res.json({ returnValue: result });
-            });
+            })
+            .catch((err) => {
+                console.log('sort game by percent recommended error   ', err);
+            })
     }
     if (field == constants.NUM_REVIWERS) {
         ops.sortGamesByNumReviwers(parseInt(order))
             .then((result) => {
                 res.json({ returnValue: result });
-            });
+            })
+            .catch((err) => {
+                console.log('sort game by number of reviewers error   ', err);
+            })
     }
 });
 
@@ -90,13 +116,19 @@ router.get('/game/filter', (req, res) => {
         ops.filterGamesByNumReviewers(min, max)
             .then((result) => {
                 res.json({ returnValue: result });
-            });
+            })
+            .catch((err) => {
+                console.log('filter games by number of reviewers error   ', err);
+            })
     }
     if (field == constants.PERCENT_RECOMMENDED) {
         ops.filterGamesByPercentRecommended(min, max)
             .then((result) => {
                 res.json({ returnValue: result });
-            });
+            })
+            .catch((err) => {
+                console.log('filter games by percent recommended error   ', err);
+            })
     }
 });
 
@@ -106,7 +138,10 @@ router.get('/game/:id', (req, res) => {
     ops.getGameByID(id)
         .then((result) => {
             res.json({ returnValue: result[0] });
-        });
+        })
+        .catch((err) => {
+            console.log('get game by id error   ', err);
+        })
 });
 
 router.get('/game/title/:title', (req, res) => {
@@ -115,18 +150,38 @@ router.get('/game/title/:title', (req, res) => {
     ops.getTitleWithGameId(id)
         .then((result) => {
             res.json({ returnValue: result[0] });
-        });
+        }).catch((err) => {
+            console.log('get game by title (review helper caller) error   ', err);
+        })
 });
 
 router.post('/game', async (req, res) => {
     const { game_id, game_title, percent_recommended, game_img_url, num_reviewers } = req.body;
 
-    ops.createGame(game_id, game_title, percent_recommended, num_reviewers, game_img_url)
-        .then((result) => {
-            res.json({ returnValue: result });
-        }).catch((err) => {
-            console.log(err);
-        })
+    await kafka.producer.connect();
+
+    const kafkaObj = {
+        'game_id': game_id,
+        'game_title': game_title
+    };
+
+    await kafka.producer.send({
+        topic: 'testTopic',
+        messages: [
+            { key: 'testing mongo connection', value: JSON.stringify(kafkaObj) },
+        ]
+    });
+
+    res.json({ returnValue: 'REDIS SERVER DOWN' })
+
+    await kafka.producer.disconnect();
+
+    // ops.createGame(game_id, game_title, percent_recommended, num_reviewers, game_img_url)
+    //     .then((result) => {
+    //         res.json({ returnValue: result });
+    //     }).catch((err) => {
+    //         console.log(err);
+    //     });
 });
 
 module.exports = router;
