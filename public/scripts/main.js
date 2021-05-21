@@ -329,10 +329,12 @@ rhit.MainPageController = class {
 				.then((data) => {
 					for (let val of data.returnValue) {
 						rhit.GetReviewInfo(val).then(retData => {
-							$('#reviewedOptList').append($('<option>', {
-								value: retData.game_id,
-								text: retData.game_title
-							}));
+							rhit.GetTitleInfo(retData.game_id).then(title => {
+								$('#reviewedOptList').append($('<option>', {
+									value: retData.game_id,
+									text: title
+								}));
+							});
 						});
 					}
 				});
@@ -699,7 +701,6 @@ rhit.MainPageController = class {
 	}
 
 	_createCard(item) {
-		console.log('item info  ', item);
 		return htmlToElement(`
 		<div id="${item.game_id}" class="col-md-4 card-with-non-favorite">
               <div class="card mb-4 box-shadow" data-item-id="${item.game_id}">
@@ -717,7 +718,6 @@ rhit.MainPageController = class {
 	}
 
 	_createReviewCard(item, title) {
-		console.log('creating review card   ', item);
 		if (item.recommended) {
 			return htmlToElement(`
 				<div id="${item.id}" class="col-md-4 card-with-non-favorite">
