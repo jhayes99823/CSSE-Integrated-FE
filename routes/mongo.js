@@ -137,6 +137,7 @@ router.get('/game/:id', (req, res) => {
 
     ops.getGameByID(id)
         .then((result) => {
+            console.log('get game by id result   ', result);
             res.json({ returnValue: result[0] });
         })
         .catch((err) => {
@@ -158,12 +159,12 @@ router.get('/game/title/:title', (req, res) => {
 router.post('/game', async (req, res) => {
     const { game_id, game_title, percent_recommended, game_img_url, num_reviewers } = req.body;
 
-    // ops.createGame(game_id, game_title, percent_recommended, num_reviewers, game_img_url)
-    //     .then((result) => {
-    //         res.json({ returnValue: result });
-    //     }).catch((err) => {
-    //         console.log(err);
-    //     });
+    ops.createGame(game_id, game_title, percent_recommended, num_reviewers, game_img_url)
+        .then((result) => {
+            res.json({ returnValue: result });
+        }).catch((err) => {
+            console.log(err);
+        });
 });
 
 module.exports = router;

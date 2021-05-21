@@ -77,7 +77,7 @@ function _recommendGames(userId) {
     WHERE game NOT IN (SELECT OUT().name FROM User WHERE name = :userId )
     GROUP BY game
     ORDER BY score DESC
-    LIMIT 10`;
+    LIMIT 12`;
 
     return db.query(
         recStr,

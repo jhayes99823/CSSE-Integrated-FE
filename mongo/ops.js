@@ -104,9 +104,7 @@ async function createGame(game_id, title, perc_rec, n_reviewers, game_img_url, o
 }
 
 async function getGameByID(id) {
-    let game = await Games.find({ game_id: id });
-
-    console.log(game);
+    let game = await Games.find({ game_id: id }).exec();
 
     return game;
 }

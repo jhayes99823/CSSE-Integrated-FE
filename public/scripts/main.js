@@ -121,6 +121,7 @@ rhit.MainPageController = class {
 		this.getLikedList()
 		this.getDislikedList();
 		this.getReviewedList();
+		this.getRecommendedList();
 
 		document.querySelector('#logout-btn').addEventListener("click", (event) => {
 			localStorage.removeItem(rhit.CURR_USER_KEY);
@@ -689,6 +690,34 @@ rhit.MainPageController = class {
 
 		// remove old quoteListContainer
 		const oldList = document.querySelector("#itemRow-review");
+		oldList.removeAttribute("id");
+		oldList.hidden = true;
+
+		// put in new quoteListContainer
+		oldList.parentElement.appendChild(newList);
+	}
+
+	getRecommendedList() {
+		const newList = htmlToElement('<div id="itemRow-recommended" class="row"> </div>');
+
+		fetch(rhit.ORIENT_URL + '/recommend?userId=' + rhit.currUserUsername())
+			.then(response => response.json())
+			.then((data) => {
+				console.log('data   ', data);
+				console.log('data.resultValue   ', data.returnValue);
+				for (let val of data.returnValue) {
+					console.log('getting recommended list data   ', val);
+					rhit.GetGameInfo(val).then(retData => {
+						console.log('recc data   creating card with info   ', retData);
+						const newCard = this._createCard(retData);
+
+						newList.appendChild(newCard);
+					});
+				}
+			});
+
+		// remove old quoteListContainer
+		const oldList = document.querySelector("#itemRow-recommended");
 		oldList.removeAttribute("id");
 		oldList.hidden = true;
 
