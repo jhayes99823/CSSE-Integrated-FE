@@ -6,9 +6,11 @@ const constants = require('../common/constants');
 const db = require('mongoose').connection;
 
 db.on('reconnected', async function () {
-    await kafka.consumer.connect();
+    await kafka.mongoConsumer.connect();
 
-    await kafka.consumer.run({
+    console.log('coming from mongo consumer');
+
+    await kafka.mongoConsumer.run({
         eachMessage: async ({ topic, partition, message }) => {
             console.log({
                 value: message.value.toString(),

@@ -6,7 +6,9 @@ const kafka = new Kafka({
 })
 
 const producer = kafka.producer();
-const consumer = kafka.consumer({ groupId: 'test-group' });
+const consumer = kafka.consumer({ groupId: 'redis-db' });
+const orientConsumer = kafka.consumer({ groupId: 'orient-db' });
+const mongoConsumer = kafka.consumer({ groupId: 'mongodb' });
 
 // async function startProducer() {
 //     await producer.connect()
@@ -47,5 +49,7 @@ const consumer = kafka.consumer({ groupId: 'test-group' });
 
 module.exports = {
     producer,
-    consumer
+    consumer,
+    orientConsumer,
+    mongoConsumer
 }

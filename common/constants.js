@@ -28,13 +28,6 @@ const REMOVE_DISLIKED_GAME = 'remove disliked game';
 const CREATE_REVIEW_ORIENT = 'create review orient';
 const DELETE_REVIEW_ORIENT = 'delete review orient';
 
-// DATABASER STATUS DEFAULT
-const DATABASE_STATUS_DEFAULT = JSON.stringify({
-    "redis": true,
-    "orient": true,
-    "mongo": true
-});
-
 const DATABASE_STATUS_FILE_LOCATION = "/home/csse/CSSE-Integrated-FE/database_status.json";
 
 module.exports = {
@@ -58,7 +51,6 @@ module.exports = {
     ADD_DISLIKED_GAME,
     REMOVE_LIKED_GAME,
     REMOVE_DISLIKED_GAME,
-    DATABASE_STATUS_DEFAULT,
     DATABASE_STATUS_FILE_LOCATION,
     CREATE_REVIEW_ORIENT,
     DELETE_REVIEW_ORIENT

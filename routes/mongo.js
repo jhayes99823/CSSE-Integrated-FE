@@ -158,24 +158,6 @@ router.get('/game/title/:title', (req, res) => {
 router.post('/game', async (req, res) => {
     const { game_id, game_title, percent_recommended, game_img_url, num_reviewers } = req.body;
 
-    await kafka.producer.connect();
-
-    const kafkaObj = {
-        'game_id': game_id,
-        'game_title': game_title
-    };
-
-    await kafka.producer.send({
-        topic: 'testTopic',
-        messages: [
-            { key: 'testing mongo connection', value: JSON.stringify(kafkaObj) },
-        ]
-    });
-
-    res.json({ returnValue: 'REDIS SERVER DOWN' })
-
-    await kafka.producer.disconnect();
-
     // ops.createGame(game_id, game_title, percent_recommended, num_reviewers, game_img_url)
     //     .then((result) => {
     //         res.json({ returnValue: result });

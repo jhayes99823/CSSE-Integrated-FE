@@ -1,6 +1,7 @@
 var ODatabase = require('orientjs').ODatabase;
 const constants = require('../common/constants');
-const fs = require('fs');
+const kafka = require('../kafka/index');
+const orient = require('../common/database_status');
 
 var db = new ODatabase({
     host: '433-21.csse.rose-hulman.edu',
@@ -10,27 +11,51 @@ var db = new ODatabase({
     name: '433project'
 });
 
-db.on("endQuery", function (obj) {
+db.on("endQuery", async function (obj) {
     console.log("DEBUG QUERY:", obj);
 
     if (obj.err != undefined) {
-        if (obj.err != undefined) {
-            var data = fs.readFileSync(constants.DATABASE_STATUS_FILE_LOCATION, (err, data) => { });
-            var dataParsed = JSON.parse(data);
-            dataParsed.orient = false;
+        orient.setOrientStatus(false);
+    } else {
+        console.log('orient db kafka part');
+        await kafka.orientConsumer.connect();
 
-            console.log('about to write to file orient=false');
+        await kafka.orientConsumer.subscribe({ topic: 'testTopic', fromBeginning: true })
 
-            try {
-                console.log('trying to write to file orient=false');
-                fs.writeFileSync('./database_status.json', JSON.stringify(dataParsed));
-                console.log('Successfully wrote file')
-            } catch (err) {
-                console.log('Error writing file', err)
+        await kafka.orientConsumer.run({
+            eachMessage: async ({ topic, partition, message }) => {
+                console.log({
+                    value: message.value.toString(),
+                });
+
+                if (message.key == constants.CREATE_REVIEW_ORIENT) {
+                    const { username, gameID, recommended } = JSON.parse(message.value);
+                    addReview(username, gameID, recommended);
+                }
+
+                if (message.key == constants.DELETE_REVIEW_ORIENT) {
+                    const { username, gameID } = JSON.parse(message.value);
+                    deleteReview(username, gameID);
+                }
             }
-        }
+        });
     }
 });
+
+async function ping() {
+    return _ping();
+}
+
+function _ping() {
+    return db.query(
+        'SELECT 1 AS a'
+    ).then((res) => {
+        console.log(`res from ping`, res)
+        return res;
+    }).catch((err) => {
+        console.log('ping function not working  ', err);
+    });
+}
 
 async function recommendGames(userId) {
     console.log(`userId`, userId);
@@ -71,14 +96,14 @@ function _recommendGames(userId) {
     });
 }
 
-async function addReview(username, gameID) {
+async function addReview(username, gameID, recommended) {
     if (!(await _userExists(username))) {
         await _addUser(username);
     }
     if (!(await _gameExists(gameID))) {
         await _addGame(gameID);
     }
-    return await _addReview(username, gameID);
+    return await _addReview(username, gameID, recommended);
 }
 
 function _userExists(username) {
@@ -161,4 +186,4 @@ function _deleteReview(username, gameID) {
     });
 }
 
-module.exports = { recommendGames, deleteReview, addReview };
+module.exports = { ping, recommendGames, deleteReview, addReview };
