@@ -144,8 +144,8 @@ router.get('/game/:id', (req, res) => {
         })
 });
 
-router.get('/game/title/:title', (req, res) => {
-    const { title } = req.params;
+router.get('/game/title/:id', (req, res) => {
+    const { id } = req.params;
 
     ops.getTitleWithGameId(id)
         .then((result) => {

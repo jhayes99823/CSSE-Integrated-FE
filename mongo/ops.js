@@ -38,8 +38,8 @@ async function getTitleWithGameId(id) {
 }
 
 async function getReviewByUser(username) {
-    let reviews = await Reviews.find({ reviewer_id: username });
-
+    let reviews = await Reviews.find({ reviewer_id: username }, {game_id: 1});
+    console.log(reviews);
     return reviews;
 }
 
