@@ -27,6 +27,8 @@ const ADD_DISLIKED_GAME = 'add disliked game';
 const REMOVE_DISLIKED_GAME = 'remove disliked game';
 const CREATE_REVIEW_ORIENT = 'create review orient';
 const DELETE_REVIEW_ORIENT = 'delete review orient';
+const CREATE_REVIEW_MONGO = 'create review mongo';
+const DELETE_REVIEW_MONGO = 'delete review mongo';
 
 const DATABASE_STATUS_FILE_LOCATION = "/home/csse/CSSE-Integrated-FE/database_status.json";
 
@@ -53,5 +55,7 @@ module.exports = {
     REMOVE_DISLIKED_GAME,
     DATABASE_STATUS_FILE_LOCATION,
     CREATE_REVIEW_ORIENT,
-    DELETE_REVIEW_ORIENT
+    DELETE_REVIEW_ORIENT,
+    CREATE_REVIEW_MONGO,
+    DELETE_REVIEW_MONGO
 };

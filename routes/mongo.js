@@ -2,6 +2,7 @@ const ops = require('../mongo/ops');
 const express = require('express');
 const router = express.Router();
 const constants = require('../common/constants');
+const mongo = require('../common/database_status');
 
 router.get('/review', (req, res) => {
     ops.getAllReviews().then((result) => {
@@ -37,24 +38,73 @@ router.get('/reviews', (req, res) => {
 router.post('/reviews', (req, res) => {
     const { username, gameID, recommended, review_text } = req.body;
 
-    ops.addReview(username, gameID, recommended, review_text)
-        .then((result) => {
-            res.json({ returnValue: result });
-        })
-        .catch((err) => {
-            console.log('create new review error   ', err);
-        })
+    const status = mongo.getMongoStatus();
+
+    if (status) {
+        ops.addReview(username, gameID, recommended, review_text)
+            .then((result) => {
+                res.json({ returnValue: result });
+            })
+            .catch((err) => {
+                console.log('create new review error   ', err);
+            })
+    }
+    else {
+        await kafka.producer.connect();
+
+        const kafkaObj = {
+            'username': username,
+            'gameID': gameID,
+            'recommended': recommended,
+            'review_text': review_text
+        };
+
+        await kafka.producer.send({
+            topic: 'testTopic',
+            messages: [
+                { key: constants.CREATE_REVIEW_MONGO, value: JSON.stringify(kafkaObj) },
+            ]
+        });
+
+        res.json({ returnValue: 'MONGO SERVER DOWN' })
+
+        await kafka.producer.disconnect();
+
+    }
 });
 
 router.delete('/reviews', (req, res) => {
     const { username, gameID } = req.body;
 
-    ops.deleteReview(username, gameID)
-        .then((result) => {
-            res.json({ returnValue: result });
-        }).catch((err) => {
-            console.log('delete review error   ', err);
-        })
+    const status = mongo.getMongoStatus();
+
+    if (status) {
+        ops.deleteReview(username, gameID)
+            .then((result) => {
+                res.json({ returnValue: result });
+            }).catch((err) => {
+                console.log('delete review error   ', err);
+            })
+    } else {
+        await kafka.producer.connect();
+
+        const kafkaObj = {
+            'username': username,
+            'gameID': gameID
+        };
+
+        await kafka.producer.send({
+            topic: 'testTopic',
+            messages: [
+                { key: constants.DELETE_REVIEW_MONGO, value: JSON.stringify(kafkaObj) },
+            ]
+        });
+
+        res.json({ returnValue: 'MONGO SERVER DOWN' })
+
+        await kafka.producer.disconnect();
+
+    }
 });
 
 router.get('/game', (req, res) => {

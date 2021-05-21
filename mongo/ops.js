@@ -4,17 +4,39 @@ let uuid = require('uuid');
 const kafka = require('../kafka/index');
 const constants = require('../common/constants');
 const db = require('mongoose').connection;
+const mongo = require('../common/database_status');
+
+db.on('disconnected', async function () {
+    mongo.setMongoStatus(false);
+    console.log('mongo db status has been set to false');
+});
 
 db.on('reconnected', async function () {
+    mongo.setMongoStatus(true);
+
     await kafka.mongoConsumer.connect();
 
     console.log('coming from mongo consumer');
+
+    await kafka.mongoConsumer.connect();
+
+    await kafka.mongoConsumer.subscribe({ topic: 'testTopic', fromBeginning: true })
 
     await kafka.mongoConsumer.run({
         eachMessage: async ({ topic, partition, message }) => {
             console.log({
                 value: message.value.toString(),
             });
+
+            if (message.key == constants.CREATE_REVIEW_MONGO) {
+                const { username, gameID, recommended, review_text } = JSON.parse(message.value);
+                addReview(username, gameID, recommended, review_text);
+            }
+
+            if (message.key == constants.DELETE_REVIEW_MONGO) {
+                const { username, gameID } = JSON.parse(message.value);
+                deleteReview(username, gameID);
+            }
         }
     });
 });
