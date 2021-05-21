@@ -349,7 +349,7 @@ rhit.MainPageController = class {
 			let username = rhit.currUserUsername();
 			let data = { username, gameID: game };
 
-			console.log("Delete this game: " + gameID);
+			console.log("Delete this game: " + game);
 
 			fetch(rhit.ORIENT_URL + '/reviews', {
 				method: "DELETE",
