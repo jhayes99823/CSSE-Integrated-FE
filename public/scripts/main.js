@@ -680,9 +680,11 @@ rhit.MainPageController = class {
 				for (let val of data.returnValue) {
 					console.log('getting review list data   ', val);
 					rhit.GetReviewInfo(val).then(retData => {
-						const newCard = this._createReviewCard(retData);
+						rhit.GetTitleInfo(retData.game_id).then((title) => {
+							const newCard = this._createReviewCard(retData, title);
 
-						newList.appendChild(newCard);
+							newList.appendChild(newCard);
+						});
 					});
 				}
 			});
@@ -714,13 +716,13 @@ rhit.MainPageController = class {
 		`);
 	}
 
-	_createReviewCard(item) {
+	_createReviewCard(item, title) {
 		console.log('creating review card   ', item);
 		if (item.recommended) {
 			return htmlToElement(`
 				<div id="${item.id}" class="col-md-4 card-with-non-favorite">
 				<div class="card mb-4 box-shadow" data-item-id="${item.game_id}">
-					<div class="card-title">${rhit.GetTitleInfo(item.game_id)}</div>
+					<div class="card-title">${title}</div>
 					<div class="card-text">
 						<p>Recommended</p>
 						<p>${item.review_text}</p>
@@ -732,7 +734,7 @@ rhit.MainPageController = class {
 			return htmlToElement(`
 			<div id="${item.id}" class="col-md-4 card-with-non-favorite">
 				<div class="card mb-4 box-shadow" data-item-id="${item.game_id}">
-				<div class="card-title">${rhit.GetTitleInfo(item.game_id)}</div>
+				<div class="card-title">${title}</div>
 				<div class="card-text">
 					<p>Not Recommended</p>
 					<p>${item.review_text}</p>
