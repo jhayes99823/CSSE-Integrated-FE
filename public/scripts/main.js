@@ -720,7 +720,7 @@ rhit.MainPageController = class {
 			return htmlToElement(`
 				<div id="${item.id}" class="col-md-4 card-with-non-favorite">
 				<div class="card mb-4 box-shadow" data-item-id="${item.game_id}">
-					<div class="card-title">${item.game_title}</div>
+					<div class="card-title">${rhit.GetTitleInfo(item.game_id)}</div>
 					<div class="card-text">
 						<p>Recommended</p>
 						<p>${item.review_text}</p>
@@ -732,7 +732,7 @@ rhit.MainPageController = class {
 			return htmlToElement(`
 			<div id="${item.id}" class="col-md-4 card-with-non-favorite">
 				<div class="card mb-4 box-shadow" data-item-id="${item.game_id}">
-				<div class="card-title">${item.game_title}</div>
+				<div class="card-title">${rhit.GetTitleInfo(item.game_id)}</div>
 				<div class="card-text">
 					<p>Not Recommended</p>
 					<p>${item.review_text}</p>
@@ -772,6 +772,7 @@ rhit.GetTitleInfo = async function (gameId) {
 	const gameTitle = await fetch(rhit.MONGO_URL + '/game/title/' + gameId).then(response => response.json());
 
 	console.log('gameTitle   ', gameTitle);
+	return gameTitle;
 }
 
 rhit.currUserUsername = function () {
