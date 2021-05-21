@@ -49,6 +49,8 @@ router.post('/reviews', (req, res) => {
 router.delete('/reviews', (req, res) => {
     const { username, gameID } = req.body;
 
+    console.log("DELETE TIME!!!!! " + username + " " + gameID)
+
     ops.deleteReview(username, gameID)
         .then((result) => {
             res.json({ returnValue: result });
