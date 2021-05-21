@@ -42,7 +42,7 @@ function _recommendGames(userId) {
         console.log(`gameIds`, gameIds);
         return gameIds;
     }).catch((err) => {
-        console.log(err);
+        console.log('error getting recommendations direct from DB ', err);
     });
 }
 
@@ -63,7 +63,7 @@ function _userExists(username) {
     ).then((res) => {
         return res.length != 0;
     }).catch((err) => {
-        console.log(err);
+        console.log('error checking whether user exists  ', err);
     });
 }
 
@@ -73,7 +73,7 @@ function _addUser(username) {
         { params: { username } }
     ).then((res) => {
     }).catch((err) => {
-        console.log(err);
+        console.log('error checking whether you can add a user   ', err);
     });
 }
 
@@ -84,7 +84,7 @@ function _gameExists(gameID) {
     ).then((res) => {
         return res.length != 0;
     }).catch((err) => {
-        console.log(err);
+        console.log('error checking whether a game exists   ', err);
     });
 }
 
@@ -94,7 +94,7 @@ function _addGame(gameID) {
         { params: { gameID } }
     ).then((res) => {
     }).catch((err) => {
-        console.log(err);
+        console.log('error adding a game   ', err);
     });
 }
 
@@ -103,19 +103,19 @@ function _addReview(username, gameID, recommend) {
         return db.query(
             'CREATE EDGE recommends FROM (SELECT FROM User WHERE name = :username) TO (SELECT FROM Game WHERE name = :gameID)',
             { params: { username, gameID } }
-        ).then((res) => { 
+        ).then((res) => {
             return true
         }).catch((err) => {
-            console.log(err);
+            console.log('error adding does recommend edge    ', err);
         });
     } else {
         return db.query(
             'CREATE EDGE does_not_recommend FROM (SELECT FROM User WHERE name = :username) TO (SELECT FROM Game WHERE name = :gameID)',
             { params: { username, gameID } }
-        ).then((res) => { 
+        ).then((res) => {
             return true
         }).catch((err) => {
-            console.log(err);
+            console.log('error adding a does not recommend edge   ', err);
         });
     }
 
@@ -129,10 +129,10 @@ function _deleteReview(username, gameID) {
     return db.query(
         'DELETE EDGE FROM (SELECT FROM User WHERE name = :username) TO (SELECT FROM Game WHERE name = :gameID)',
         { params: { username, gameID } }
-    ).then((res) => { 
+    ).then((res) => {
         return true
     }).catch((err) => {
-        console.log(err);
+        console.log('error deleting review   ', err);
     });
 }
 
