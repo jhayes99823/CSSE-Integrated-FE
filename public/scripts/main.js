@@ -765,16 +765,13 @@ rhit.GetReviewInfo = async function (id) {
 	const review = await fetch(rhit.MONGO_URL + '/review/' + id.review_id).then(response => response.json());
 
 	console.log(`review.returnValue.game_id`, review.returnValue);
-	const gameTitle = rhit.GetTitleInfo(review.returnValue.game_title)
 
 	return review.returnValue;
 }
 
 rhit.GetTitleInfo = async function (gameId) {
 	const gameTitle = await fetch(rhit.MONGO_URL + '/game/title/' + gameId).then(response => response.json());
-
-	console.log('gameTitle   ', gameTitle.game_title);
-	return gameTitle.game_title;
+	return gameTitle.returnValue.game_title;
 }
 
 rhit.currUserUsername = function () {
