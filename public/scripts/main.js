@@ -11,7 +11,7 @@ var rhit = rhit || {};
 
 /** globals */
 rhit.variableName = "";
-rhit.BASE_URL = "http://433-21.csse.rose-hulman.edu:3100/api";
+rhit.BASE_URL = "http://433-22.csse.rose-hulman.edu:3100/api";
 rhit.MONGO_URL = rhit.BASE_URL + '/mongo';
 rhit.REDIS_URL = rhit.BASE_URL + '/redis';
 rhit.ORIENT_URL = rhit.BASE_URL + '/orient';
