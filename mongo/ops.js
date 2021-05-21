@@ -60,13 +60,8 @@ async function addReview(username, gameID, recommended, review_text) {
 }
 
 async function deleteReview(username, gameID) {
-    console.log("Delete review " + username + " " + gameID)
     let review = await Reviews.findOne({ reviewer_id: username, game_id: gameID });
-    console.log("REVIEW================================")
-    console.log(review._id);
     let res = await Reviews.deleteOne({ _id: review._id });
-    console.log("=============DELETE RESPONSE==============")
-    console.log(res)
     return res;
 }
 

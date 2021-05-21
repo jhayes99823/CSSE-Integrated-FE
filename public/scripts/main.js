@@ -304,7 +304,6 @@ rhit.MainPageController = class {
 
 
 		$("#addReviewModal").on("show.bs.modal", (event) => {
-			console.log('made it here   review');
 			// pre animation
 			fetch(rhit.MONGO_URL + '/game')
 				.then(response => response.json())
@@ -349,21 +348,17 @@ rhit.MainPageController = class {
 			let username = rhit.currUserUsername();
 			let data = { username, gameID: game };
 
-			console.log("Delete this game: " + game);
-
 			fetch(rhit.ORIENT_URL + '/reviews', {
 				method: "DELETE",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify(data)
 			}).then((orientRes) => {
-				console.log("Orient says: " + orientRes)
 				fetch(rhit.MONGO_URL + '/reviews', {
 					method: "DELETE",
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify(data)
 				}).then(response => response.json())
 					.then((data) => {
-						console.log("Mongo says: " + data)
 						if (data) location.reload();
 					});
 			});
@@ -374,13 +369,10 @@ rhit.MainPageController = class {
 			// let recommended = document.querySelector("#gameReviewedRecommend").value;
 			let recommended = $("#gameReviewedRecommend").is(":checked") ? "true" : "false";
 
-			console.log('rec from front end   ', recommended);
 			let reviewText = document.querySelector("#gameReviewedText").value;
-			console.log('review text  ', reviewText);
 			const username = rhit.currUserUsername();
 			const data = { username, gameID: game, recommended, review_text: reviewText };
 
-			console.log('data being sent to create review   ', data);
 
 			fetch(rhit.ORIENT_URL + '/reviews', {
 				method: "POST",
@@ -681,10 +673,7 @@ rhit.MainPageController = class {
 		fetch(rhit.MONGO_URL + '/reviews?username=' + rhit.currUserUsername())
 			.then(response => response.json())
 			.then((data) => {
-				console.log('data   ', data);
-				console.log('data.resultValue   ', data.returnValue);
 				for (let val of data.returnValue) {
-					console.log('getting review list data   ', val);
 					rhit.GetReviewInfo(val).then(retData => {
 						rhit.GetTitleInfo(retData.game_id).then((title) => {
 							const newCard = this._createReviewCard(retData, title);
@@ -765,11 +754,7 @@ rhit.GetGameInfo = async function (id) {
 }
 
 rhit.GetReviewInfo = async function (id) {
-	console.log('getting review info id   ', id);
 	const review = await fetch(rhit.MONGO_URL + '/review/' + id.review_id).then(response => response.json());
-
-	console.log(`review.returnValue.game_id`, review.returnValue);
-
 	return review.returnValue;
 }
 
