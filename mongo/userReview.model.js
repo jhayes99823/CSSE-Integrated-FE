@@ -9,7 +9,7 @@ let UserReview = new Schema({
         type: String
     },
     game_id: {
-        type: String
+        type: Number
     },
     recommended: {
         type: Boolean
