@@ -773,8 +773,8 @@ rhit.GetReviewInfo = async function (id) {
 rhit.GetTitleInfo = async function (gameId) {
 	const gameTitle = await fetch(rhit.MONGO_URL + '/game/title/' + gameId).then(response => response.json());
 
-	console.log('gameTitle   ', gameTitle);
-	return gameTitle;
+	console.log('gameTitle   ', gameTitle.game_title);
+	return gameTitle.game_title;
 }
 
 rhit.currUserUsername = function () {

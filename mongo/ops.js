@@ -33,8 +33,6 @@ async function getReviewByID(id) {
 
 async function getTitleWithGameId(id) {
     let gameTitle = await Games.find({ game_id: id }, {game_title: 1});
-    console.log("==========================TITLE================")
-    console.log(gameTitle);
     return gameTitle;
 }
 
