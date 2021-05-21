@@ -349,17 +349,21 @@ rhit.MainPageController = class {
 			let username = rhit.currUserUsername();
 			let data = { username, gameID: game };
 
+			console.log("Delete this game: " + gameID);
+
 			fetch(rhit.ORIENT_URL + '/reviews', {
 				method: "DELETE",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify(data)
 			}).then((orientRes) => {
+				console.log("Orient says: " + orientRes)
 				fetch(rhit.MONGO_URL + '/reviews', {
 					method: "DELETE",
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify(data)
 				}).then(response => response.json())
 					.then((data) => {
+						console.log("Mongo says: " + data)
 						if (data) location.reload();
 					});
 			});
