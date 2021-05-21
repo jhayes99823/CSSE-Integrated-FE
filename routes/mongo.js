@@ -146,7 +146,7 @@ router.get('/game/:id', (req, res) => {
 
 router.get('/game/title/:id', (req, res) => {
     const { id } = req.params;
-
+    console.log("Get game title with id: " + id);
     ops.getTitleWithGameId(id)
         .then((result) => {
             res.json({ returnValue: result[0] });
