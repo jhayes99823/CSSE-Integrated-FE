@@ -49,6 +49,8 @@ router.post('/reviews', (req, res) => {
 router.delete('/reviews', (req, res) => {
     const { username, gameID } = req.body;
 
+    console.log("DELETE TIME!!!!! " + username + " " + gameID)
+
     ops.deleteReview(username, gameID)
         .then((result) => {
             res.json({ returnValue: result });
@@ -144,9 +146,8 @@ router.get('/game/:id', (req, res) => {
         })
 });
 
-router.get('/game/title/:title', (req, res) => {
-    const { title } = req.params;
-
+router.get('/game/title/:id', (req, res) => {
+    const { id } = req.params;
     ops.getTitleWithGameId(id)
         .then((result) => {
             res.json({ returnValue: result[0] });

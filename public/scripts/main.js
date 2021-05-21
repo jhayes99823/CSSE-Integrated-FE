@@ -11,7 +11,7 @@ var rhit = rhit || {};
 
 /** globals */
 rhit.variableName = "";
-rhit.BASE_URL = "http://433-21.csse.rose-hulman.edu:3100/api";
+rhit.BASE_URL = "http://433-22.csse.rose-hulman.edu:3100/api";
 rhit.MONGO_URL = rhit.BASE_URL + '/mongo';
 rhit.REDIS_URL = rhit.BASE_URL + '/redis';
 rhit.ORIENT_URL = rhit.BASE_URL + '/orient';
@@ -304,7 +304,6 @@ rhit.MainPageController = class {
 
 
 		$("#addReviewModal").on("show.bs.modal", (event) => {
-			console.log('made it here   review');
 			// pre animation
 			fetch(rhit.MONGO_URL + '/game')
 				.then(response => response.json())
@@ -329,10 +328,12 @@ rhit.MainPageController = class {
 				.then((data) => {
 					for (let val of data.returnValue) {
 						rhit.GetReviewInfo(val).then(retData => {
-							$('#reviewedOptList').append($('<option>', {
-								value: retData.game_id,
-								text: retData.game_title
-							}));
+							rhit.GetTitleInfo(retData.game_id).then(title => {
+								$('#reviewedOptList').append($('<option>', {
+									value: retData.game_id,
+									text: title
+								}));
+							});
 						});
 					}
 				});
@@ -368,13 +369,10 @@ rhit.MainPageController = class {
 			// let recommended = document.querySelector("#gameReviewedRecommend").value;
 			let recommended = $("#gameReviewedRecommend").is(":checked") ? "true" : "false";
 
-			console.log('rec from front end   ', recommended);
 			let reviewText = document.querySelector("#gameReviewedText").value;
-			console.log('review text  ', reviewText);
 			const username = rhit.currUserUsername();
 			const data = { username, gameID: game, recommended, review_text: reviewText };
 
-			console.log('data being sent to create review   ', data);
 
 			fetch(rhit.ORIENT_URL + '/reviews', {
 				method: "POST",
@@ -675,14 +673,13 @@ rhit.MainPageController = class {
 		fetch(rhit.MONGO_URL + '/reviews?username=' + rhit.currUserUsername())
 			.then(response => response.json())
 			.then((data) => {
-				console.log('data   ', data);
-				console.log('data.resultValue   ', data.returnValue);
 				for (let val of data.returnValue) {
-					console.log('getting review list data   ', val);
 					rhit.GetReviewInfo(val).then(retData => {
-						const newCard = this._createReviewCard(retData);
+						rhit.GetTitleInfo(retData.game_id).then((title) => {
+							const newCard = this._createReviewCard(retData, title);
 
-						newList.appendChild(newCard);
+							newList.appendChild(newCard);
+						});
 					});
 				}
 			});
@@ -697,7 +694,6 @@ rhit.MainPageController = class {
 	}
 
 	_createCard(item) {
-		console.log('item info  ', item);
 		return htmlToElement(`
 		<div id="${item.game_id}" class="col-md-4 card-with-non-favorite">
               <div class="card mb-4 box-shadow" data-item-id="${item.game_id}">
@@ -714,13 +710,12 @@ rhit.MainPageController = class {
 		`);
 	}
 
-	_createReviewCard(item) {
-		console.log('creating review card   ', item);
+	_createReviewCard(item, title) {
 		if (item.recommended) {
 			return htmlToElement(`
 				<div id="${item.id}" class="col-md-4 card-with-non-favorite">
 				<div class="card mb-4 box-shadow" data-item-id="${item.game_id}">
-					<div class="card-title">${item.game_title}</div>
+					<div class="card-title">${title}</div>
 					<div class="card-text">
 						<p>Recommended</p>
 						<p>${item.review_text}</p>
@@ -732,7 +727,7 @@ rhit.MainPageController = class {
 			return htmlToElement(`
 			<div id="${item.id}" class="col-md-4 card-with-non-favorite">
 				<div class="card mb-4 box-shadow" data-item-id="${item.game_id}">
-				<div class="card-title">${item.game_title}</div>
+				<div class="card-title">${title}</div>
 				<div class="card-text">
 					<p>Not Recommended</p>
 					<p>${item.review_text}</p>
@@ -759,19 +754,13 @@ rhit.GetGameInfo = async function (id) {
 }
 
 rhit.GetReviewInfo = async function (id) {
-	console.log('getting review info id   ', id);
 	const review = await fetch(rhit.MONGO_URL + '/review/' + id.review_id).then(response => response.json());
-
-	console.log(`review.returnValue.game_id`, review.returnValue);
-	const gameTitle = rhit.GetTitleInfo(review.returnValue.game_title)
-
 	return review.returnValue;
 }
 
 rhit.GetTitleInfo = async function (gameId) {
 	const gameTitle = await fetch(rhit.MONGO_URL + '/game/title/' + gameId).then(response => response.json());
-
-	console.log('gameTitle   ', gameTitle);
+	return gameTitle.returnValue.game_title;
 }
 
 rhit.currUserUsername = function () {
